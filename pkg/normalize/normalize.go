@@ -5,6 +5,7 @@
 package normalize
 
 import (
+	"encoding/base64"
 	"fmt"
 	"math"
 	"strings"
@@ -60,7 +61,9 @@ var assigned = map[string][]*objpath.Pattern{
 		".spec.finalizers",
 		`.metadata.labels["kubernetes.io/metadata.name"]`,
 	),
-	"/Pod": compileAll(".spec.nodeName", ".spec.serviceAccount"),
+	"/Pod":             compileAll(".spec.nodeName", ".spec.serviceAccount"),
+	"apps/StatefulSet": compileAll(".spec.volumeClaimTemplates[].status"),
+	"apps/DaemonSet":   compileAll(`.metadata.annotations["deprecated.daemonset.template.generation"]`),
 }
 
 func compileAll(srcs ...string) []*objpath.Pattern {
@@ -76,6 +79,7 @@ func compileAll(srcs ...string) []*objpath.Pattern {
 var emptyMapKeys = map[string]bool{
 	"labels": true, "annotations": true, "data": true, "binaryData": true, "stringData": true,
 	"nodeSelector": true, "matchLabels": true, "requests": true, "limits": true, "selector": true,
+	"metadata": true, // nested template metadata ({} after dropping creationTimestamp: null)
 }
 
 // quantityParents are map fields whose values are resource.Quantity strings.
@@ -213,6 +217,9 @@ func PrepareLive(live *unstructured.Unstructured, desired map[string]any) (*Prep
 func PrepareDesired(u *unstructured.Unstructured) *unstructured.Unstructured {
 	obj := runtime.DeepCopyJSON(u.Object)
 	StripServerFields(obj)
+	if gvk := u.GroupVersionKind(); gvk.Group == "" && gvk.Kind == "Secret" {
+		foldStringData(obj)
+	}
 	Canonicalize(obj)
 	return &unstructured.Unstructured{Object: obj}
 }
@@ -223,4 +230,26 @@ func decodeLastApplied(raw string) (*unstructured.Unstructured, error) {
 		return nil, fmt.Errorf("parse %s annotation: %w", LastAppliedAnnotation, err)
 	}
 	return &unstructured.Unstructured{Object: obj}, nil
+}
+
+// foldStringData mirrors what the API server does with Secret.stringData:
+// each entry is base64-encoded into data (overriding data) and stringData is
+// dropped, so a desired Secret written with stringData compares equal to the
+// stored object.
+func foldStringData(obj map[string]any) {
+	sd, ok := obj["stringData"].(map[string]any)
+	if !ok {
+		return
+	}
+	data, _ := obj["data"].(map[string]any)
+	if data == nil {
+		data = map[string]any{}
+	}
+	for k, v := range sd {
+		if s, ok := v.(string); ok {
+			data[k] = base64.StdEncoding.EncodeToString([]byte(s))
+		}
+	}
+	obj["data"] = data
+	delete(obj, "stringData")
 }

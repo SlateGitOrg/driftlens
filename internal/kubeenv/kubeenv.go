@@ -30,7 +30,7 @@ func Assets() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrNoAssets, err)
 	}
-	dir := filepath.Join(base, "k8s", fmt.Sprintf("%s-%s-%s", K8sVersion, runtime.GOOS, runtime.GOARCH))
+	dir := filepath.Join(base, fmt.Sprintf("%s-%s-%s", K8sVersion, runtime.GOOS, runtime.GOARCH))
 	return dir, check(dir)
 }
 

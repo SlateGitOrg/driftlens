@@ -84,7 +84,11 @@ func writeObject(w *errWriter, p painter, obj drift.ObjectResult, o TextOptions)
 	}
 	if o.ShowIgnored {
 		for _, ig := range obj.Ignored {
-			w.printf("  %s\n", p.c(ansiDim, fmt.Sprintf("= %s  ignored by %s: %s", ig.Path, ig.Rule, ig.Reason)))
+			by := "ignored by " + ig.Rule
+			if ig.Rule == "-" {
+				by = "ignored"
+			}
+			w.printf("  %s\n", p.c(ansiDim, fmt.Sprintf("= %s  %s: %s", ig.Path, by, ig.Reason)))
 		}
 	}
 }
@@ -152,7 +156,7 @@ func origin(ch drift.Change) string {
 
 func writeValue(w *errWriter, p painter, label string, v any, color string) {
 	lines := renderValue(v)
-	pad := fmt.Sprintf("      %-13s", label)
+	pad := fmt.Sprintf("      %-14s", label)
 	if len(lines) == 1 {
 		w.printf("%s%s\n", pad, p.c(color, lines[0]))
 		return
@@ -175,13 +179,13 @@ func renderValue(v any) []string {
 // SummaryLine renders the one-line summary of a report.
 func SummaryLine(r *drift.Report) string {
 	s := r.Summary
-	parts := []string{fmt.Sprintf("%d objects", s.Objects)}
+	parts := []string{plural(s.Objects, "object")}
 	for _, st := range []drift.Status{drift.StatusInSync, drift.StatusOutOfSync, drift.StatusDrifted, drift.StatusMissing, drift.StatusError} {
 		if n := s.ByStatus[st]; n > 0 {
 			parts = append(parts, fmt.Sprintf("%d %s", n, strings.ToLower(statusWord(st))))
 		}
 	}
-	line := strings.Join(parts, ", ") + fmt.Sprintf("; %d changes", s.Changes)
+	line := strings.Join(parts, ", ") + "; " + plural(s.Changes, "change")
 	if s.Changes > 0 {
 		line += " (" + counts(s.ByCategory) + "; " + counts(s.ByOrigin) + fmt.Sprintf("; %d manual)", s.Manual)
 	}
@@ -227,4 +231,11 @@ func (e *errWriter) printf(format string, args ...any) {
 		return
 	}
 	_, e.err = fmt.Fprintf(e.w, format, args...)
+}
+
+func plural(n int, word string) string {
+	if n == 1 {
+		return "1 " + word
+	}
+	return fmt.Sprintf("%d %ss", n, word)
 }

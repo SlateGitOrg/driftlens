@@ -152,7 +152,9 @@ func statefulSet(spec map[string]any) {
 	us := mapAt(spec, "updateStrategy")
 	setDefault(us, "type", "RollingUpdate")
 	if us != nil && us["type"] == "RollingUpdate" {
-		setDefault(mapAt(us, "rollingUpdate"), "partition", int64(0))
+		ru := mapAt(us, "rollingUpdate")
+		setDefault(ru, "partition", int64(0))
+		setDefault(ru, "maxUnavailable", int64(1))
 	}
 	rp := mapAt(spec, "persistentVolumeClaimRetentionPolicy")
 	setDefault(rp, "whenDeleted", "Retain")

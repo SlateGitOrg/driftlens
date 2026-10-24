@@ -173,7 +173,7 @@ func parseJQ(s string) ([]step, error) {
 	}
 }
 
-func (p *jqParser) eof() bool         { return p.pos >= len(p.s) }
+func (p *jqParser) eof() bool          { return p.pos >= len(p.s) }
 func (p *jqParser) peekIs(c byte) bool { return !p.eof() && p.s[p.pos] == c }
 
 func (p *jqParser) skipSpace() {

@@ -65,13 +65,13 @@ func (c *classifier) add(res *ObjectResult, op Op, p fieldpath.Path) {
 		ch.Pointer = ptr
 	}
 	if dok {
-		ch.Desired = dv
+		ch.Desired = c.redact(objp, dv)
 	}
 	if lok {
-		ch.Live = lv
+		ch.Live = c.redact(objp, lv)
 	}
 	if aok {
-		ch.LastApplied = av
+		ch.LastApplied = c.redact(objp, av)
 	}
 
 	switch op {
@@ -153,6 +153,20 @@ func (c *classifier) originRemove(aok bool, own owners) (Origin, string, bool) {
 		return OriginUnknown, "the field exists only live and nothing records who set it", true
 	}
 	return "", "live-only field with no owner outside GitOps: treated as a server default", false
+}
+
+// Redacted replaces Secret payload values in reports.
+const Redacted = "<redacted>"
+
+// redact hides Secret data: a report must never become a way to read secrets.
+func (c *classifier) redact(p objpath.Path, v any) any {
+	if c.gvk.Group != "" || c.gvk.Kind != "Secret" || len(p) == 0 {
+		return v
+	}
+	if f := p[0].Field; f == "data" || f == "stringData" {
+		return Redacted
+	}
+	return v
 }
 
 var scaleKinds = map[string]bool{
