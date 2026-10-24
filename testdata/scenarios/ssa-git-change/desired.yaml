@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: ssa-git-change
+spec:
+  replicas: 4
+  selector:
+    matchLabels: {app: checkout}
+  template:
+    metadata:
+      labels: {app: checkout}
+    spec:
+      containers:
+        - name: checkout
+          image: ghcr.io/example/checkout:2.1.0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: checkout-flags
+  namespace: ssa-git-change
+data:
+  NEW_CART: "true"
+  REGION: eu-west-1

@@ -1,0 +1,125 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 9,
+    "byStatus": {
+      "InSync": 9
+    },
+    "changes": 0,
+    "byCategory": {},
+    "byOrigin": {},
+    "manualChanges": 0,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "in-sync-defaults",
+        "name": "web-config"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "Secret",
+        "namespace": "in-sync-defaults",
+        "name": "web-token"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "in-sync-defaults",
+        "name": "web"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "in-sync-defaults",
+        "name": "web-nodeport"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "DaemonSet",
+        "namespace": "in-sync-defaults",
+        "name": "agent"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "in-sync-defaults",
+        "name": "web"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "StatefulSet",
+        "namespace": "in-sync-defaults",
+        "name": "db"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "batch",
+        "version": "v1",
+        "kind": "CronJob",
+        "namespace": "in-sync-defaults",
+        "name": "report"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    },
+    {
+      "ref": {
+        "group": "networking.k8s.io",
+        "version": "v1",
+        "kind": "NetworkPolicy",
+        "namespace": "in-sync-defaults",
+        "name": "web"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    }
+  ]
+}

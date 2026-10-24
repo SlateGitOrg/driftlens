@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop
+  namespace: ignore-rules
+  annotations:
+    example.com/last-sync: "2026-10-24T09:00:00Z"
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: shop}
+  template:
+    metadata:
+      labels: {app: shop}
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/example/shop:5.0.1
+          resources:
+            requests: {cpu: 200m, memory: 256Mi}
+        - name: metrics
+          image: ghcr.io/example/exporter:0.9.0
+          resources:
+            requests: {cpu: 10m}

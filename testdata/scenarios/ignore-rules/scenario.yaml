@@ -1,0 +1,21 @@
+description: >
+  Expected churn is configured away: an autoscaler (kube-controller-manager
+  via the scale subresource) owns replicas, a sync bot stamps an annotation,
+  and a VPA-style recommender rewrites one container's resources. Ignore
+  rules written as a manager glob, a JSON pointer and a jq select() hide
+  exactly those; a manual annotation added in the same window still shows.
+mutations:
+  - manager: kube-controller-manager
+    subresource: scale
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: ignore-rules, name: shop}
+    mergePatch: {spec: {replicas: 7}}
+  - manager: sync-bot
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: ignore-rules, name: shop}
+    mergePatch: {metadata: {annotations: {example.com/last-sync: "2026-10-25T10:00:00Z"}}}
+  - manager: vpa-recommender
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: ignore-rules, name: shop}
+    jsonPatch:
+      - {op: replace, path: /spec/template/spec/containers/0/resources/requests/cpu, value: 400m}
+  - manager: kubectl-annotate
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: ignore-rules, name: shop}
+    mergePatch: {metadata: {annotations: {oncall-note: "investigating latency"}}}

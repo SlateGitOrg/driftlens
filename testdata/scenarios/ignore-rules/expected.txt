@@ -1,0 +1,9 @@
+apps/v1 Deployment ignore-rules/shop  DRIFTED  manual-edit, metadata  (basis: managed-fields, schema: openapi)
+  - .metadata.annotations.oncall-note  [metadata] live drift by kubectl-annotate (manual edit)
+      why: the field was added live by another field manager
+      live:         investigating latency
+  = .metadata.annotations["example.com/last-sync"]  ignored by sync-bot-stamp: path /metadata/annotations/example.com~1last-sync
+  = .spec.replicas  ignored by hpa-owns-replicas: owned by kube-controller-manager (scale)
+  = .spec.template.spec.containers[name="app"].resources.requests.cpu  ignored by vpa-app-resources: path .spec.template.spec.containers[] | select(.name == "app") | .resources
+
+Summary: 1 object, 1 drifted; 1 change (1 metadata; 1 live; 1 manual); 3 ignored

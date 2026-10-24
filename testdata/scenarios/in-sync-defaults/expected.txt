@@ -1,0 +1,11 @@
+v1 ConfigMap in-sync-defaults/web-config  in sync
+v1 Secret in-sync-defaults/web-token  in sync
+v1 Service in-sync-defaults/web  in sync
+v1 Service in-sync-defaults/web-nodeport  in sync
+apps/v1 DaemonSet in-sync-defaults/agent  in sync
+apps/v1 Deployment in-sync-defaults/web  in sync
+apps/v1 StatefulSet in-sync-defaults/db  in sync
+batch/v1 CronJob in-sync-defaults/report  in sync
+networking.k8s.io/v1 NetworkPolicy in-sync-defaults/web  in sync
+
+Summary: 9 objects, 9 in sync; 0 changes

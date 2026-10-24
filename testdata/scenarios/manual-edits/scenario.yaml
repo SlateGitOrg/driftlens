@@ -1,0 +1,21 @@
+description: >
+  A Deployment applied by GitOps (server-side apply as "driftlens"), then
+  edited by hand: kubectl scale, kubectl set image, kubectl label and a
+  kubectl edit that adds an environment variable. Every change must be
+  attributed to the kubectl command that made it.
+mutations:
+  - manager: kubectl-scale
+    subresource: scale
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: manual-edits, name: api}
+    mergePatch: {spec: {replicas: 5}}
+  - manager: kubectl-set
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: manual-edits, name: api}
+    jsonPatch:
+      - {op: replace, path: /spec/template/spec/containers/0/image, value: "ghcr.io/example/api:1.5.0-hotfix"}
+  - manager: kubectl-label
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: manual-edits, name: api}
+    mergePatch: {metadata: {labels: {debug: "true"}}}
+  - manager: kubectl-edit
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: manual-edits, name: api}
+    jsonPatch:
+      - {op: add, path: /spec/template/spec/containers/0/env/-, value: {name: LOG_LEVEL, value: debug}}

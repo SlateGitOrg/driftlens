@@ -1,0 +1,10 @@
+description: >
+  A custom resource has no schema compiled into driftlens, so it is compared
+  with the deduced schema: maps are granular, lists are atomic. A manual edit
+  of one list element is reported as a change of the whole list.
+mutations:
+  - manager: kubectl-edit
+    target: {apiVersion: example.com/v1, kind: Widget, namespace: crd-deduced, name: gizmo}
+    jsonPatch:
+      - {op: replace, path: /spec/endpoints/1, value: "https://b-canary.example.com"}
+      - {op: replace, path: /spec/size, value: 9}

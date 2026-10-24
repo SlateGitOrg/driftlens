@@ -1,0 +1,101 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 2,
+    "byStatus": {
+      "OutOfSync": 2
+    },
+    "changes": 4,
+    "byCategory": {
+      "image": 1,
+      "scale": 1,
+      "spec": 2
+    },
+    "byOrigin": {
+      "git": 4
+    },
+    "manualChanges": 0,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "ssa-git-change",
+        "name": "checkout-flags"
+      },
+      "status": "OutOfSync",
+      "classes": [
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".data.NEW_CART",
+          "pointer": "/data/NEW_CART",
+          "op": "modify",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "desired": "true",
+          "live": "false",
+          "note": "the GitOps manager owns the live value, so Git changed"
+        },
+        {
+          "path": ".data.LEGACY_TAX",
+          "pointer": "/data/LEGACY_TAX",
+          "op": "remove",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "live": "true",
+          "note": "Git removed the field; the GitOps manager still owns it, so the next apply prunes it"
+        }
+      ]
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "ssa-git-change",
+        "name": "checkout"
+      },
+      "status": "OutOfSync",
+      "classes": [
+        "image",
+        "scale"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".spec.replicas",
+          "pointer": "/spec/replicas",
+          "op": "modify",
+          "category": "scale",
+          "origin": "git",
+          "manual": false,
+          "desired": 4,
+          "live": 3,
+          "note": "the GitOps manager owns the live value, so Git changed"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"checkout\"].image",
+          "pointer": "/spec/template/spec/containers/0/image",
+          "op": "modify",
+          "category": "image",
+          "origin": "git",
+          "manual": false,
+          "desired": "ghcr.io/example/checkout:2.1.0",
+          "live": "ghcr.io/example/checkout:2.0.0",
+          "note": "the GitOps manager owns the live value, so Git changed"
+        }
+      ]
+    }
+  ]
+}

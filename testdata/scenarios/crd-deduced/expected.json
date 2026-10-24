@@ -1,0 +1,73 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 1,
+    "byStatus": {
+      "Drifted": 1
+    },
+    "changes": 2,
+    "byCategory": {
+      "spec": 2
+    },
+    "byOrigin": {
+      "live": 2
+    },
+    "manualChanges": 2,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "example.com",
+        "version": "v1",
+        "kind": "Widget",
+        "namespace": "crd-deduced",
+        "name": "gizmo"
+      },
+      "status": "Drifted",
+      "classes": [
+        "manual-edit",
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "deduced",
+      "changes": [
+        {
+          "path": ".spec.endpoints",
+          "pointer": "/spec/endpoints",
+          "op": "modify",
+          "category": "spec",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-edit"
+          ],
+          "desired": [
+            "https://a.example.com",
+            "https://b.example.com"
+          ],
+          "live": [
+            "https://a.example.com",
+            "https://b-canary.example.com"
+          ],
+          "note": "another field manager took ownership of this field"
+        },
+        {
+          "path": ".spec.size",
+          "pointer": "/spec/size",
+          "op": "modify",
+          "category": "spec",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-edit"
+          ],
+          "desired": 3,
+          "live": 9,
+          "note": "another field manager took ownership of this field"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+apps/v1 Deployment manual-edits/api  DRIFTED  image, manual-edit, metadata, scale, spec  (basis: managed-fields, schema: openapi)
+  ~ .spec.replicas  [scale] live drift by kubectl-scale (scale) (manual edit)
+      why: another field manager took ownership of this field
+      desired:      2
+      live:         5
+  ~ .spec.template.spec.containers[name="api"].image  [image] live drift by kubectl-set (manual edit)
+      why: another field manager took ownership of this field
+      desired:      ghcr.io/example/api:1.4.2
+      live:         ghcr.io/example/api:1.5.0-hotfix
+  - .metadata.labels.debug  [metadata] live drift by kubectl-label (manual edit)
+      why: the field was added live by another field manager
+      live:         "true"
+  - .spec.template.spec.containers[name="api"].env[name="LOG_LEVEL"]  [spec] live drift by kubectl-edit (manual edit)
+      why: the field was added live by another field manager
+      live:
+        name: LOG_LEVEL
+        value: debug
+
+Summary: 1 object, 1 drifted; 4 changes (1 image, 1 metadata, 1 scale, 1 spec; 4 live; 4 manual)

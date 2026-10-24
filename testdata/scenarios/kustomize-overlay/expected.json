@@ -1,0 +1,75 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 1,
+    "byStatus": {
+      "OutOfSync": 1
+    },
+    "changes": 3,
+    "byCategory": {
+      "image": 1,
+      "scale": 1,
+      "spec": 1
+    },
+    "byOrigin": {
+      "git": 3
+    },
+    "manualChanges": 0,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "kustomize-overlay",
+        "name": "frontend"
+      },
+      "status": "OutOfSync",
+      "classes": [
+        "image",
+        "scale",
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".spec.replicas",
+          "pointer": "/spec/replicas",
+          "op": "modify",
+          "category": "scale",
+          "origin": "git",
+          "manual": false,
+          "desired": 3,
+          "live": 1,
+          "note": "the GitOps manager owns the live value, so Git changed"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"frontend\"].image",
+          "pointer": "/spec/template/spec/containers/0/image",
+          "op": "modify",
+          "category": "image",
+          "origin": "git",
+          "manual": false,
+          "desired": "ghcr.io/example/frontend:7.2.0",
+          "live": "ghcr.io/example/frontend:7.1.0",
+          "note": "the GitOps manager owns the live value, so Git changed"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"frontend\"].env[name=\"API_URL\"].value",
+          "pointer": "/spec/template/spec/containers/0/env/0/value",
+          "op": "modify",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "desired": "http://api.prod.internal",
+          "live": "http://api.staging.internal",
+          "note": "the GitOps manager owns the live value, so Git changed"
+        }
+      ]
+    }
+  ]
+}

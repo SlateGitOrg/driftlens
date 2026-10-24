@@ -1,0 +1,40 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 2,
+    "byStatus": {
+      "InSync": 1,
+      "Missing": 1
+    },
+    "changes": 0,
+    "byCategory": {},
+    "byOrigin": {},
+    "manualChanges": 0,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "missing-object",
+        "name": "cache"
+      },
+      "status": "Missing"
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "missing-object",
+        "name": "cache"
+      },
+      "status": "InSync",
+      "basis": "managed-fields",
+      "schema": "openapi"
+    }
+  ]
+}

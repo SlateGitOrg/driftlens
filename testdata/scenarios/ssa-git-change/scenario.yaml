@@ -1,0 +1,5 @@
+description: >
+  Git moved on (new image tag, new replica count, a changed and a removed
+  ConfigMap key) but nobody touched the cluster. Field ownership proves the
+  live values are the ones driftlens applied, so every change is a pending
+  Git change and the objects are OutOfSync, not Drifted.

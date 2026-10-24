@@ -1,0 +1,3 @@
+description: >
+  Git declares a Service that was never applied (or was deleted live) next
+  to a Deployment that is in sync.

@@ -1,0 +1,11 @@
+apiVersion: driftlens/v1
+kind: DriftConfig
+ignore:
+  - name: hpa-owns-replicas
+    match: {group: apps, kind: Deployment}
+    managers: [kube-controller-manager]
+  - name: sync-bot-stamp
+    paths: ["/metadata/annotations/example.com~1last-sync"]
+  - name: vpa-app-resources
+    match: {kind: Deployment, name: "shop*"}
+    paths: ['.spec.template.spec.containers[] | select(.name == "app") | .resources']

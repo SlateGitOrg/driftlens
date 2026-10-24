@@ -1,0 +1,10 @@
+v1 ConfigMap ssa-ambiguous-add/added-in-git  DRIFTED  spec  (basis: managed-fields, schema: openapi)
+  + .data.MODE  [spec] origin unknown
+      why: the field is absent live; without last-applied values a Git addition and a live deletion look the same
+      desired:      strict
+v1 ConfigMap ssa-ambiguous-add/deleted-live  DRIFTED  spec  (basis: managed-fields, schema: openapi)
+  + .data.MODE  [spec] origin unknown
+      why: the field is absent live; without last-applied values a Git addition and a live deletion look the same
+      desired:      strict
+
+Summary: 2 objects, 2 drifted; 2 changes (2 spec; 2 unknown; 0 manual)

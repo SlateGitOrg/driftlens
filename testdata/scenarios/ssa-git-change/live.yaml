@@ -1,0 +1,86 @@
+# Captured from a real kube-apiserver (envtest) by `make fixtures`; do not edit.
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:replicas: {}
+          f:selector: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"checkout"}:
+                  .: {}
+                  f:image: {}
+                  f:name: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: checkout
+    namespace: ssa-git-change
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: checkout
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: checkout
+      spec:
+        containers:
+        - image: ghcr.io/example/checkout:2.0.0
+          imagePullPolicy: IfNotPresent
+          name: checkout
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status: {}
+- apiVersion: v1
+  data:
+    LEGACY_TAX: "true"
+    NEW_CART: "false"
+    REGION: eu-west-1
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          f:LEGACY_TAX: {}
+          f:NEW_CART: {}
+          f:REGION: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: checkout-flags
+    namespace: ssa-git-change
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+kind: List

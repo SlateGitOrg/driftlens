@@ -1,0 +1,15 @@
+apps/v1 Deployment kustomize-overlay/frontend  OUT OF SYNC  image, scale, spec  (basis: managed-fields, schema: openapi)
+  ~ .spec.replicas  [scale] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      3
+      live:         1
+  ~ .spec.template.spec.containers[name="frontend"].image  [image] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      ghcr.io/example/frontend:7.2.0
+      live:         ghcr.io/example/frontend:7.1.0
+  ~ .spec.template.spec.containers[name="frontend"].env[name="API_URL"].value  [spec] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      http://api.prod.internal
+      live:         http://api.staging.internal
+
+Summary: 1 object, 1 out of sync; 3 changes (1 image, 1 scale, 1 spec; 3 git; 0 manual)

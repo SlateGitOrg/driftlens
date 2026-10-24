@@ -1,0 +1,4 @@
+v1 Service missing-object/cache  MISSING
+apps/v1 Deployment missing-object/cache  in sync
+
+Summary: 2 objects, 1 in sync, 1 missing; 0 changes

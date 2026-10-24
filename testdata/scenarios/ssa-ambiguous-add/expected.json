@@ -1,0 +1,75 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 2,
+    "byStatus": {
+      "Drifted": 2
+    },
+    "changes": 2,
+    "byCategory": {
+      "spec": 2
+    },
+    "byOrigin": {
+      "unknown": 2
+    },
+    "manualChanges": 0,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "ssa-ambiguous-add",
+        "name": "added-in-git"
+      },
+      "status": "Drifted",
+      "classes": [
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".data.MODE",
+          "pointer": "/data/MODE",
+          "op": "add",
+          "category": "spec",
+          "origin": "unknown",
+          "manual": false,
+          "desired": "strict",
+          "note": "the field is absent live; without last-applied values a Git addition and a live deletion look the same"
+        }
+      ]
+    },
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "ssa-ambiguous-add",
+        "name": "deleted-live"
+      },
+      "status": "Drifted",
+      "classes": [
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".data.MODE",
+          "pointer": "/data/MODE",
+          "op": "add",
+          "category": "spec",
+          "origin": "unknown",
+          "manual": false,
+          "desired": "strict",
+          "note": "the field is absent live; without last-applied values a Git addition and a live deletion look the same"
+        }
+      ]
+    }
+  ]
+}

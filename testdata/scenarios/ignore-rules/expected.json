@@ -1,0 +1,69 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 1,
+    "byStatus": {
+      "Drifted": 1
+    },
+    "changes": 1,
+    "byCategory": {
+      "metadata": 1
+    },
+    "byOrigin": {
+      "live": 1
+    },
+    "manualChanges": 1,
+    "ignored": 3
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "ignore-rules",
+        "name": "shop"
+      },
+      "status": "Drifted",
+      "classes": [
+        "manual-edit",
+        "metadata"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".metadata.annotations.oncall-note",
+          "pointer": "/metadata/annotations/oncall-note",
+          "op": "remove",
+          "category": "metadata",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-annotate"
+          ],
+          "live": "investigating latency",
+          "note": "the field was added live by another field manager"
+        }
+      ],
+      "ignored": [
+        {
+          "path": ".metadata.annotations[\"example.com/last-sync\"]",
+          "rule": "sync-bot-stamp",
+          "reason": "path /metadata/annotations/example.com~1last-sync"
+        },
+        {
+          "path": ".spec.replicas",
+          "rule": "hpa-owns-replicas",
+          "reason": "owned by kube-controller-manager (scale)"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"app\"].resources.requests.cpu",
+          "rule": "vpa-app-resources",
+          "reason": "path .spec.template.spec.containers[] | select(.name == \"app\") | .resources"
+        }
+      ]
+    }
+  ]
+}

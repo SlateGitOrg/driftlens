@@ -1,0 +1,16 @@
+description: >
+  Objects applied with client-side `kubectl apply`, so the
+  last-applied-configuration annotation records exactly what Git said last
+  time. Git and the cluster then both move. The three-way comparison
+  separates pending Git changes, live drift, conflicts (both changed the same
+  field), Git removals that the next apply will prune, and a field deleted
+  live.
+apply: csa
+mutations:
+  - manager: kubectl-edit
+    target: {apiVersion: v1, kind: ConfigMap, namespace: csa-three-way, name: app-config}
+    mergePatch: {data: {CACHE: "off", TIMEOUT: 60s}}
+  - manager: kubectl-patch
+    target: {apiVersion: apps/v1, kind: Deployment, namespace: csa-three-way, name: worker}
+    jsonPatch:
+      - {op: remove, path: /spec/template/spec/containers/0/env/1}

@@ -1,0 +1,488 @@
+# Captured from a real kube-apiserver (envtest) by `make fixtures`; do not edit.
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    labels:
+      app: web
+    managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:app: {}
+        f:spec:
+          f:replicas: {}
+          f:selector: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"web"}:
+                  .: {}
+                  f:env:
+                    k:{"name":"POD_IP"}:
+                      .: {}
+                      f:name: {}
+                      f:valueFrom:
+                        f:fieldRef: {}
+                  f:image: {}
+                  f:name: {}
+                  f:ports:
+                    k:{"containerPort":80,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                  f:readinessProbe:
+                    f:httpGet:
+                      f:path: {}
+                      f:port: {}
+                  f:resources:
+                    f:limits:
+                      f:cpu: {}
+                      f:memory: {}
+                    f:requests:
+                      f:cpu: {}
+                      f:memory: {}
+                  f:volumeMounts:
+                    k:{"mountPath":"/etc/web"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+              f:volumes:
+                k:{"name":"config"}:
+                  .: {}
+                  f:configMap:
+                    f:name: {}
+                  f:name: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: web
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: web
+      spec:
+        containers:
+        - env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          image: nginx:1.27.2
+          imagePullPolicy: IfNotPresent
+          name: web
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 80
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/web
+            name: config
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: web-config
+          name: config
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:ports:
+            k:{"port":80,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+          f:selector: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    clusterIP: 10.0.0.129
+    clusterIPs:
+    - 10.0.0.129
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    selector:
+      app: web
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:ports:
+            k:{"port":8080,"protocol":"TCP"}:
+              .: {}
+              f:port: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:type: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web-nodeport
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    clusterIP: 10.0.0.223
+    clusterIPs:
+    - 10.0.0.223
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - nodePort: 31919
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+    selector:
+      app: web
+    sessionAffinity: None
+    type: NodePort
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  data:
+    nginx.conf: |
+      server { listen 80; }
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          f:nginx.conf: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web-config
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:selector: {}
+          f:serviceName: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"postgres"}:
+                  .: {}
+                  f:image: {}
+                  f:name: {}
+          f:volumeClaimTemplates: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: db
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: db
+    serviceName: db
+    template:
+      metadata:
+        labels:
+          app: db
+      spec:
+        containers:
+        - image: postgres:17
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    updateStrategy:
+      rollingUpdate:
+        maxUnavailable: 1
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 0
+    replicas: 0
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "1"
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:selector: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"agent"}:
+                  .: {}
+                  f:command: {}
+                  f:image: {}
+                  f:name: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: agent
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: agent
+    template:
+      metadata:
+        labels:
+          app: agent
+      spec:
+        containers:
+        - command:
+          - sleep
+          - infinity
+          image: busybox
+          imagePullPolicy: Always
+          name: agent
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 0
+    desiredNumberScheduled: 0
+    numberMisscheduled: 0
+    numberReady: 0
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    managedFields:
+    - apiVersion: batch/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:jobTemplate:
+            f:spec:
+              f:template:
+                f:spec:
+                  f:containers:
+                    k:{"name":"report"}:
+                      .: {}
+                      f:args: {}
+                      f:image: {}
+                      f:name: {}
+                  f:restartPolicy: {}
+          f:schedule: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: report
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    concurrencyPolicy: Allow
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      metadata: {}
+      spec:
+        template:
+          metadata: {}
+          spec:
+            containers:
+            - args:
+              - echo
+              - done
+              image: busybox:1.36
+              imagePullPolicy: IfNotPresent
+              name: report
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+    schedule: 0 3 * * *
+    successfulJobsHistoryLimit: 3
+    suspend: false
+  status: {}
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 1
+    managedFields:
+    - apiVersion: networking.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:ingress: {}
+          f:podSelector: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    ingress:
+    - ports:
+      - port: 80
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        app: web
+    policyTypes:
+    - Ingress
+- apiVersion: v1
+  data:
+    token: bm90LWEtcmVhbC1zZWNyZXQ=
+  kind: Secret
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:stringData:
+          f:token: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    name: web-token
+    namespace: in-sync-defaults
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  type: Opaque
+kind: List

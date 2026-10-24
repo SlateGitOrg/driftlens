@@ -1,0 +1,138 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 2,
+    "byStatus": {
+      "Drifted": 2
+    },
+    "changes": 6,
+    "byCategory": {
+      "spec": 6
+    },
+    "byOrigin": {
+      "conflict": 1,
+      "git": 3,
+      "live": 2
+    },
+    "manualChanges": 2,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "",
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "csa-three-way",
+        "name": "app-config"
+      },
+      "status": "Drifted",
+      "classes": [
+        "manual-edit",
+        "spec"
+      ],
+      "basis": "last-applied",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".data.CACHE",
+          "pointer": "/data/CACHE",
+          "op": "modify",
+          "category": "spec",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-edit"
+          ],
+          "desired": "on",
+          "live": "off",
+          "lastApplied": "on",
+          "note": "live differs from the last applied value; Git did not change"
+        },
+        {
+          "path": ".data.LOG_LEVEL",
+          "pointer": "/data/LOG_LEVEL",
+          "op": "modify",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "desired": "debug",
+          "live": "info",
+          "lastApplied": "info",
+          "note": "Git changed since the last apply; live still has the applied value"
+        },
+        {
+          "path": ".data.TIMEOUT",
+          "pointer": "/data/TIMEOUT",
+          "op": "modify",
+          "category": "spec",
+          "origin": "conflict",
+          "manual": true,
+          "actors": [
+            "kubectl-edit"
+          ],
+          "desired": "45s",
+          "live": "60s",
+          "lastApplied": "30s",
+          "note": "Git and live both changed since the last apply"
+        },
+        {
+          "path": ".data.RETRIES",
+          "pointer": "/data/RETRIES",
+          "op": "add",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "desired": "3",
+          "note": "Git added the field since the last apply"
+        },
+        {
+          "path": ".data.LEGACY_ENDPOINT",
+          "pointer": "/data/LEGACY_ENDPOINT",
+          "op": "remove",
+          "category": "spec",
+          "origin": "git",
+          "manual": false,
+          "live": "http://old.internal",
+          "lastApplied": "http://old.internal",
+          "note": "Git removed the field since the last apply; applying will prune it"
+        }
+      ]
+    },
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "csa-three-way",
+        "name": "worker"
+      },
+      "status": "Drifted",
+      "classes": [
+        "spec"
+      ],
+      "basis": "last-applied",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".spec.template.spec.containers[name=\"worker\"].env[name=\"FEATURE_BATCHING\"]",
+          "pointer": "/spec/template/spec/containers/0/env/1",
+          "op": "add",
+          "category": "spec",
+          "origin": "live",
+          "manual": false,
+          "desired": {
+            "name": "FEATURE_BATCHING",
+            "value": "true"
+          },
+          "lastApplied": {
+            "name": "FEATURE_BATCHING",
+            "value": "true"
+          },
+          "note": "the field was applied but has been removed live"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+# Captured from a real kube-apiserver (envtest) by `make fixtures`; do not edit.
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    creationTimestamp: "2026-01-01T00:00:00Z"
+    generation: 4
+    labels:
+      app: api
+      debug: "true"
+      team: payments
+    managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:app: {}
+            f:team: {}
+        f:spec:
+          f:selector: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                f:app: {}
+            f:spec:
+              f:containers:
+                k:{"name":"api"}:
+                  .: {}
+                  f:env:
+                    k:{"name":"PORT"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                  f:name: {}
+                  f:ports:
+                    k:{"containerPort":8080,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+      manager: driftlens
+      operation: Apply
+      time: "2026-01-01T00:00:00Z"
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:replicas: {}
+      manager: kubectl-scale
+      operation: Update
+      subresource: scale
+      time: "2026-01-01T00:00:00Z"
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:template:
+            f:spec:
+              f:containers:
+                k:{"name":"api"}:
+                  f:env:
+                    k:{"name":"LOG_LEVEL"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+      manager: kubectl-edit
+      operation: Update
+      time: "2026-01-01T00:00:00Z"
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:debug: {}
+      manager: kubectl-label
+      operation: Update
+      time: "2026-01-01T00:00:00Z"
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:template:
+            f:spec:
+              f:containers:
+                k:{"name":"api"}:
+                  f:image: {}
+      manager: kubectl-set
+      operation: Update
+      time: "2026-01-01T00:00:00Z"
+    name: api
+    namespace: manual-edits
+    resourceVersion: "1"
+    uid: 00000000-0000-0000-0000-000000000000
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 5
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: api
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: api
+      spec:
+        containers:
+        - env:
+          - name: PORT
+            value: "8080"
+          - name: LOG_LEVEL
+            value: debug
+          image: ghcr.io/example/api:1.5.0-hotfix
+          imagePullPolicy: IfNotPresent
+          name: api
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status: {}
+kind: List

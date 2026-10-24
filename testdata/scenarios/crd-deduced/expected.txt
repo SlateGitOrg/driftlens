@@ -1,0 +1,15 @@
+example.com/v1 Widget crd-deduced/gizmo  DRIFTED  manual-edit, spec  (basis: managed-fields, schema: deduced)
+  ~ .spec.endpoints  [spec] live drift by kubectl-edit (manual edit)
+      why: another field manager took ownership of this field
+      desired:
+        - https://a.example.com
+        - https://b.example.com
+      live:
+        - https://a.example.com
+        - https://b-canary.example.com
+  ~ .spec.size  [spec] live drift by kubectl-edit (manual edit)
+      why: another field manager took ownership of this field
+      desired:      3
+      live:         9
+
+Summary: 1 object, 1 drifted; 2 changes (2 spec; 2 live; 2 manual)

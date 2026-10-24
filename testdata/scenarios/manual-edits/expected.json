@@ -1,0 +1,102 @@
+{
+  "apiVersion": "driftlens/v1",
+  "defaults": "static",
+  "summary": {
+    "objects": 1,
+    "byStatus": {
+      "Drifted": 1
+    },
+    "changes": 4,
+    "byCategory": {
+      "image": 1,
+      "metadata": 1,
+      "scale": 1,
+      "spec": 1
+    },
+    "byOrigin": {
+      "live": 4
+    },
+    "manualChanges": 4,
+    "ignored": 0
+  },
+  "objects": [
+    {
+      "ref": {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "manual-edits",
+        "name": "api"
+      },
+      "status": "Drifted",
+      "classes": [
+        "image",
+        "manual-edit",
+        "metadata",
+        "scale",
+        "spec"
+      ],
+      "basis": "managed-fields",
+      "schema": "openapi",
+      "changes": [
+        {
+          "path": ".spec.replicas",
+          "pointer": "/spec/replicas",
+          "op": "modify",
+          "category": "scale",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-scale (scale)"
+          ],
+          "desired": 2,
+          "live": 5,
+          "note": "another field manager took ownership of this field"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"api\"].image",
+          "pointer": "/spec/template/spec/containers/0/image",
+          "op": "modify",
+          "category": "image",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-set"
+          ],
+          "desired": "ghcr.io/example/api:1.4.2",
+          "live": "ghcr.io/example/api:1.5.0-hotfix",
+          "note": "another field manager took ownership of this field"
+        },
+        {
+          "path": ".metadata.labels.debug",
+          "pointer": "/metadata/labels/debug",
+          "op": "remove",
+          "category": "metadata",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-label"
+          ],
+          "live": "true",
+          "note": "the field was added live by another field manager"
+        },
+        {
+          "path": ".spec.template.spec.containers[name=\"api\"].env[name=\"LOG_LEVEL\"]",
+          "pointer": "/spec/template/spec/containers/0/env/1",
+          "op": "remove",
+          "category": "spec",
+          "origin": "live",
+          "manual": true,
+          "actors": [
+            "kubectl-edit"
+          ],
+          "live": {
+            "name": "LOG_LEVEL",
+            "value": "debug"
+          },
+          "note": "the field was added live by another field manager"
+        }
+      ]
+    }
+  ]
+}

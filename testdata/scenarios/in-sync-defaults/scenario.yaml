@@ -1,0 +1,4 @@
+description: >
+  Minimal manifests applied with server-side apply and left alone. The API
+  server fills in dozens of defaults (strategy, probes, protocols, clusterIP,
+  quantities in canonical form); none of them may be reported as drift.

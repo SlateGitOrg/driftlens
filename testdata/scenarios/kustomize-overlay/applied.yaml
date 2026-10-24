@@ -1,0 +1,19 @@
+# What `kustomize build base` produced when it was last applied.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: kustomize-overlay
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: frontend}
+  template:
+    metadata:
+      labels: {app: frontend}
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/example/frontend:7.1.0
+          env:
+            - {name: API_URL, value: http://api.staging.internal}

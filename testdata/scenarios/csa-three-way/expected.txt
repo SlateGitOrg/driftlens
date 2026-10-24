@@ -1,0 +1,30 @@
+v1 ConfigMap csa-three-way/app-config  DRIFTED  manual-edit, spec  (basis: last-applied, schema: openapi)
+  ~ .data.CACHE  [spec] live drift by kubectl-edit (manual edit)
+      why: live differs from the last applied value; Git did not change
+      desired:      "on"
+      live:         "off"
+      last-applied: "on"
+  ~ .data.LOG_LEVEL  [spec] pending Git change
+      why: Git changed since the last apply; live still has the applied value
+      desired:      debug
+      live:         info
+      last-applied: info
+  ~ .data.TIMEOUT  [spec] conflict: Git and live both changed by kubectl-edit (manual edit)
+      why: Git and live both changed since the last apply
+      desired:      45s
+      live:         60s
+      last-applied: 30s
+  + .data.RETRIES  [spec] pending Git change
+      why: Git added the field since the last apply
+      desired:      "3"
+  - .data.LEGACY_ENDPOINT  [spec] pending Git change
+      why: Git removed the field since the last apply; applying will prune it
+      live:         http://old.internal
+apps/v1 Deployment csa-three-way/worker  DRIFTED  spec  (basis: last-applied, schema: openapi)
+  + .spec.template.spec.containers[name="worker"].env[name="FEATURE_BATCHING"]  [spec] live drift
+      why: the field was applied but has been removed live
+      desired:
+        name: FEATURE_BATCHING
+        value: "true"
+
+Summary: 2 objects, 2 drifted; 6 changes (6 spec; 1 conflict, 3 git, 2 live; 2 manual)

@@ -1,0 +1,19 @@
+v1 ConfigMap ssa-git-change/checkout-flags  OUT OF SYNC  spec  (basis: managed-fields, schema: openapi)
+  ~ .data.NEW_CART  [spec] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      "true"
+      live:         "false"
+  - .data.LEGACY_TAX  [spec] pending Git change
+      why: Git removed the field; the GitOps manager still owns it, so the next apply prunes it
+      live:         "true"
+apps/v1 Deployment ssa-git-change/checkout  OUT OF SYNC  image, scale  (basis: managed-fields, schema: openapi)
+  ~ .spec.replicas  [scale] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      4
+      live:         3
+  ~ .spec.template.spec.containers[name="checkout"].image  [image] pending Git change
+      why: the GitOps manager owns the live value, so Git changed
+      desired:      ghcr.io/example/checkout:2.1.0
+      live:         ghcr.io/example/checkout:2.0.0
+
+Summary: 2 objects, 2 out of sync; 4 changes (1 image, 1 scale, 2 spec; 4 git; 0 manual)

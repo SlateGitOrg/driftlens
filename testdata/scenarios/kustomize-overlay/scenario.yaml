@@ -1,0 +1,5 @@
+description: >
+  Desired state is a Kustomize overlay built in-process (images, replicas
+  and a strategic-merge patch on top of a base). The cluster still runs the
+  base as applied earlier, so the overlay's effects are pending Git changes.
+desiredKustomize: overlays/prod

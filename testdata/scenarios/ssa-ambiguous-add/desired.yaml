@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: added-in-git
+  namespace: ssa-ambiguous-add
+data:
+  NAME: a
+  MODE: strict
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deleted-live
+  namespace: ssa-ambiguous-add
+data:
+  NAME: b
+  MODE: strict

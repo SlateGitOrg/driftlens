@@ -1,0 +1,11 @@
+description: >
+  Two objects end up with the same structural difference (a field present in
+  Git but absent live). In one, Git added the field; in the other, someone
+  deleted it live with kubectl edit. Server-side-apply ownership keeps no
+  record of a deletion, so with managedFields alone driftlens must report the
+  origin as unknown for both rather than guess.
+mutations:
+  - manager: kubectl-edit
+    target: {apiVersion: v1, kind: ConfigMap, namespace: ssa-ambiguous-add, name: deleted-live}
+    jsonPatch:
+      - {op: remove, path: /data/MODE}
