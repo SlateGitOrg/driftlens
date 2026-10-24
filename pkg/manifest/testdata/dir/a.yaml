@@ -1,0 +1,6 @@
+# leading comment document
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: a}
+data: {k: v}
