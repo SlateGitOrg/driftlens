@@ -44,12 +44,12 @@ func (Static) Default(_ context.Context, in *unstructured.Unstructured) (*unstru
 	spec := existingMap(obj, "spec")
 	switch gvk.Group + "/" + gvk.Kind {
 	case "/Pod":
+		setDefault(spec, "enableServiceLinks", true)
 		podSpec(spec, true)
 	case "/PodTemplate":
 		podSpec(mapAt(mapAt(obj, "template"), "spec"), true)
 	case "/ReplicationController":
-		setDefault(spec, "replicas", int64(1))
-		podSpec(templateSpec(spec), true)
+		replicationController(obj, spec)
 	case "apps/Deployment":
 		deployment(spec)
 	case "apps/ReplicaSet":
@@ -125,6 +125,26 @@ func templateSpec(spec map[string]any) map[string]any {
 	return mapAt(mapAt(spec, "template"), "spec")
 }
 
+// replicationController mirrors core/v1 RC defaulting: selector and object
+// labels are copied from the pod template labels when absent.
+func replicationController(obj, spec map[string]any) {
+	if spec == nil {
+		return
+	}
+	setDefault(spec, "replicas", int64(1))
+	if tl := existingMap(existingMap(existingMap(spec, "template"), "metadata"), "labels"); len(tl) > 0 {
+		if _, ok := spec["selector"]; !ok {
+			spec["selector"] = runtime.DeepCopyJSONValue(tl)
+		}
+		if md := existingMap(obj, "metadata"); md != nil {
+			if _, ok := md["labels"]; !ok {
+				md["labels"] = runtime.DeepCopyJSONValue(tl)
+			}
+		}
+	}
+	podSpec(templateSpec(spec), true)
+}
+
 func deployment(spec map[string]any) {
 	if spec == nil {
 		return
@@ -190,6 +210,7 @@ func job(spec map[string]any) {
 	setDefault(spec, "backoffLimit", int64(6))
 	setDefault(spec, "completionMode", "NonIndexed")
 	setDefault(spec, "suspend", false)
+	setDefault(spec, "manualSelector", false)
 	if _, ok := spec["completions"]; !ok {
 		if p, _ := spec["parallelism"].(int64); p == 1 {
 			spec["completions"] = int64(1)
@@ -218,11 +239,11 @@ func service(spec map[string]any) {
 		return
 	}
 	setDefault(spec, "type", "ClusterIP")
+	setDefault(spec, "sessionAffinity", "None")
 	typ, _ := spec["type"].(string)
 	if typ == "ExternalName" {
 		return
 	}
-	setDefault(spec, "sessionAffinity", "None")
 	setDefault(spec, "internalTrafficPolicy", "Cluster")
 	if typ == "NodePort" || typ == "LoadBalancer" {
 		setDefault(spec, "externalTrafficPolicy", "Cluster")

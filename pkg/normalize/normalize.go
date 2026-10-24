@@ -51,6 +51,10 @@ var assigned = map[string][]*objpath.Pattern{
 	),
 	"batch/Job": compileAll(
 		".spec.selector",
+		`.metadata.labels["controller-uid"]`,
+		`.metadata.labels["batch.kubernetes.io/controller-uid"]`,
+		`.metadata.labels["batch.kubernetes.io/job-name"]`,
+		`.metadata.labels["job-name"]`,
 		`.spec.template.metadata.labels["controller-uid"]`,
 		`.spec.template.metadata.labels["batch.kubernetes.io/controller-uid"]`,
 		`.spec.template.metadata.labels["batch.kubernetes.io/job-name"]`,
