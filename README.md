@@ -239,8 +239,8 @@ with other build jobs.
 tests cannot silently skip, then the coverage gate):
 
 ```
-66 tests + 81 subtests passed, 0 failed, 1 skipped
-core coverage: 96.1% (1739/1810 statements), threshold 80%
+74 tests + 83 subtests passed, 0 failed, 1 skipped
+core coverage: 96.1% (1847/1922 statements), threshold 80%
 ```
 
 The skip is the server-defaults replay of the one client-side-apply scenario, which
