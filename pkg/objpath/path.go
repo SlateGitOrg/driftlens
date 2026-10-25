@@ -405,17 +405,7 @@ func del(node any, p Path) (any, bool) {
 	if !ok {
 		return node, false
 	}
-	i := -1
-	switch s.Kind {
-	case SegIndex:
-		if s.Index >= 0 && s.Index < len(l) {
-			i = s.Index
-		}
-	case SegKey:
-		i, _ = findKeyed(l, s.Key)
-	case SegValue:
-		i, _ = findValue(l, s.Value)
-	}
+	i := position(l, s)
 	if i < 0 {
 		return node, false
 	}
@@ -427,4 +417,53 @@ func del(node any, p Path) (any, bool) {
 		l[i] = nv
 	}
 	return l, ok
+}
+
+// set stores v at p inside obj, replacing an existing value. It reports
+// whether the location was found.
+func set(obj any, p Path, v any) bool {
+	parent, ok := Get(obj, p[:len(p)-1])
+	if !ok {
+		return false
+	}
+	s := p[len(p)-1]
+	if s.Kind == SegField {
+		m, ok := parent.(map[string]any)
+		if !ok {
+			return false
+		}
+		if _, ok := m[s.Field]; !ok {
+			return false
+		}
+		m[s.Field] = v
+		return true
+	}
+	l, ok := parent.([]any)
+	if !ok {
+		return false
+	}
+	i := position(l, s)
+	if i < 0 {
+		return false
+	}
+	l[i] = v
+	return true
+}
+
+// position returns the index of the element of l that the list segment s
+// names, or -1.
+func position(l []any, s Segment) int {
+	switch s.Kind {
+	case SegIndex:
+		if s.Index >= 0 && s.Index < len(l) {
+			return s.Index
+		}
+	case SegKey:
+		i, _ := findKeyed(l, s.Key)
+		return i
+	case SegValue:
+		i, _ := findValue(l, s.Value)
+		return i
+	}
+	return -1
 }

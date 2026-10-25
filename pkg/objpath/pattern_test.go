@@ -1,6 +1,7 @@
 package objpath
 
 import (
+	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
@@ -213,6 +214,108 @@ func TestPositional(t *testing.T) {
 			if len(f) != len(c.segs) {
 				t.Errorf("%s: match %s has %d segments, want %d", c.src, f, len(f), len(c.segs))
 			}
+		}
+	}
+}
+
+func TestSplitAtLastIndex(t *testing.T) {
+	cases := []struct {
+		src        string
+		ok         bool
+		head, tail int // step counts; tail -1 when nil
+	}{
+		{"/spec/replicas", false, 0, -1},
+		{"/spec/containers/1", true, 3, -1},
+		{"/spec/containers/1/args/*", true, 3, 2},
+		{".spec.containers[0].env[1].value", true, 5, 1},
+		{`.spec.containers[0] | select(.name == "web") | .args[]`, true, 4, 2},
+		{`.spec.containers[0] | select(.name == "web")`, true, 4, -1},
+	}
+	for _, c := range cases {
+		h, tl, ok := MustCompile(c.src).SplitAtLastIndex()
+		if ok != c.ok {
+			t.Errorf("%s: ok %v", c.src, ok)
+			continue
+		}
+		if !ok {
+			continue
+		}
+		if len(h.steps) != c.head || (tl == nil) != (c.tail < 0) || (tl != nil && len(tl.steps) != c.tail) {
+			t.Errorf("%s: head %d tail %v", c.src, len(h.steps), tl)
+		}
+		if h.String() != MustCompile(c.src).String() {
+			t.Errorf("%s: head source %q", c.src, h.String())
+		}
+	}
+}
+
+func TestPruneAt(t *testing.T) {
+	obj := func() map[string]any {
+		return map[string]any{"spec": map[string]any{
+			"containers": []any{
+				map[string]any{"name": "side", "args": []any{"p"}},
+				map[string]any{"name": "web", "args": []any{"a", "b", "c"}, "m": []any{[]any{1, 2}}},
+			},
+		}}
+	}
+	web := append(Fields("spec", "containers"), Key(KeyField{Name: "name", Value: "web"}))
+	cases := []struct {
+		pat  string
+		at   Path
+		n    int
+		want string
+	}{
+		{"/args/*", web, 3, `{"spec":{"containers":[{"args":["p"],"name":"side"},{"args":[],"m":[[1,2]],"name":"web"}]}}`},
+		{".args[1]", web, 1, `{"spec":{"containers":[{"args":["p"],"name":"side"},{"args":["a","c"],"m":[[1,2]],"name":"web"}]}}`},
+		// A list root: the shortened list is stored back in its parent.
+		{"/0", append(append(Path(nil), web...), Field("m"), Index(0)), 1, `{"spec":{"containers":[{"args":["p"],"name":"side"},{"args":["a","b","c"],"m":[[2]],"name":"web"}]}}`},
+		{"/args/*", append(Fields("spec", "containers"), Key(KeyField{Name: "name", Value: "nope"})), 0, ""},
+		{"/nope", web, 0, ""},
+	}
+	for _, c := range cases {
+		o := obj()
+		if n := MustCompile(c.pat).PruneAt(o, c.at); n != c.n {
+			t.Errorf("%s at %s: removed %d, want %d", c.pat, c.at, n, c.n)
+			continue
+		}
+		b, _ := json.Marshal(o)
+		if c.n == 0 {
+			if !reflect.DeepEqual(o, obj()) {
+				t.Errorf("%s at %s changed the object: %s", c.pat, c.at, b)
+			}
+			continue
+		}
+		if string(b) != c.want {
+			t.Errorf("%s at %s: got %s", c.pat, c.at, b)
+		}
+	}
+	// The whole object as the root.
+	o := obj()
+	if n := MustCompile("/spec/containers/1/args/0").PruneAt(o, nil); n != 1 {
+		t.Errorf("root: removed %d", n)
+	}
+}
+
+func TestSet(t *testing.T) {
+	o := map[string]any{"a": map[string]any{"b": 1}, "l": []any{"x", map[string]any{"name": "k"}}}
+	cases := []struct {
+		p  Path
+		ok bool
+	}{
+		{Fields("a", "b"), true},
+		{Fields("a", "c"), false},
+		{Fields("a", "b", "c"), false},
+		{append(Fields("l"), Segment{Kind: SegValue, Value: "x"}), true},
+		{append(Fields("l"), Segment{Kind: SegValue, Value: "x"}), false}, // replaced above
+		{append(Fields("l"), Key(KeyField{Name: "name", Value: "k"})), true},
+		{append(Fields("l"), Index(0)), true},
+		{append(Fields("l"), Index(9)), false},
+		{append(Fields("a"), Index(0)), false},
+		{append(Fields("missing"), Index(0)), false},
+	}
+	for _, c := range cases {
+		if got := set(o, c.p, "v"); got != c.ok {
+			t.Errorf("set(%s) = %v", c.p, got)
 		}
 	}
 }

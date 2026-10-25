@@ -617,3 +617,43 @@ func (p *Pattern) PositionalSegments() []bool {
 	}
 	return out
 }
+
+// SplitAtLastIndex splits p after its last list-index step and the select()
+// steps that directly follow it. head selects the indexed elements; tail
+// selects values below each of them and is nil when nothing follows. ok is
+// false when p has no index step.
+func (p *Pattern) SplitAtLastIndex() (head, tail *Pattern, ok bool) {
+	last := -1
+	for i, st := range p.steps {
+		if st.kind == stepIndex || st.kind == stepFieldOrIndex {
+			last = i
+		}
+	}
+	if last < 0 {
+		return nil, nil, false
+	}
+	cut := last + 1
+	for cut < len(p.steps) && p.steps[cut].kind == stepSelect {
+		cut++
+	}
+	head = &Pattern{src: p.src, steps: p.steps[:cut:cut]}
+	if cut < len(p.steps) {
+		tail = &Pattern{src: p.src, steps: p.steps[cut:]}
+	}
+	return head, tail, true
+}
+
+// PruneAt deletes every value the pattern selects below the value at path at
+// in obj (which Prune would do with that value as the root) and returns how
+// many values were removed. Elements of at are found as Get finds them.
+func (p *Pattern) PruneAt(obj any, at Path) int {
+	node, ok := Get(obj, at)
+	if !ok {
+		return 0
+	}
+	n, repl := prune(node, p.steps)
+	if n > 0 && len(at) > 0 {
+		set(obj, at, repl) // a pruned list may have shrunk: store the new header
+	}
+	return n
+}
