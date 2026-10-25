@@ -172,9 +172,10 @@ func IsKustomization(dir string) bool {
 	return false
 }
 
-// BuildKustomization runs `kustomize build` in-process on dir. Plugins and
-// remote bases are disabled; load restrictions are kustomize's default
-// (files must live under the kustomization root).
+// BuildKustomization runs `kustomize build` in-process on dir. Plugins are
+// disabled and load restrictions are kustomize's default (local files must
+// live under the kustomization root); remote bases are resolved by kustomize
+// itself, as with the kustomize CLI.
 func BuildKustomization(dir string) ([]*unstructured.Unstructured, error) {
 	k := krusty.MakeKustomizer(krusty.MakeDefaultOptions())
 	rm, err := k.Run(filesys.MakeFsOnDisk(), dir)
