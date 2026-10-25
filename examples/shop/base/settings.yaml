@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shop-settings
+data:
+  CURRENCY: EUR
+  FEATURE_RECOMMENDATIONS: "off"
+  CHECKOUT_TIMEOUT: 30s

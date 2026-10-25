@@ -62,7 +62,7 @@ var assigned = map[string][]*objpath.Pattern{
 	),
 	"/ServiceAccount": compileAll(".secrets"),
 	"/Namespace": compileAll(
-		".spec.finalizers",
+		".spec", // only holds the server-managed finalizers list
 		`.metadata.labels["kubernetes.io/metadata.name"]`,
 	),
 	"/Pod":             compileAll(".spec.nodeName", ".spec.serviceAccount"),

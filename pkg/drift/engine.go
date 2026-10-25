@@ -186,6 +186,9 @@ func (e *Engine) diff(ctx context.Context, desired, live *unstructured.Unstructu
 						p.Prune(eff[i].Object)
 					}
 				}
+				// Pruning can leave empty maps behind (an annotations map
+				// whose only key was ignored); drop them like the server does.
+				normalize.Canonicalize(eff[i].Object)
 			}
 		}
 	}

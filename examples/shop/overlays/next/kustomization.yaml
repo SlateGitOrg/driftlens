@@ -1,0 +1,10 @@
+# The next Git revision: a new worker release and a feature flag flip.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../prod
+images:
+  - name: ghcr.io/example/shop-worker
+    newTag: 2.4.0
+patches:
+  - path: settings-patch.yaml

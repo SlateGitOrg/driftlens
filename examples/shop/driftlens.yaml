@@ -1,0 +1,14 @@
+# driftlens configuration for the demo shop.
+apiVersion: driftlens/v1
+kind: DriftConfig
+# Field managers that represent the GitOps pipeline (default list plus ours).
+gitopsManagers: [argocd-controller, driftlens, kustomize-controller]
+ignore:
+  # The api Deployment is autoscaled: the HPA controller writes replicas
+  # through the scale subresource as kube-controller-manager.
+  - name: hpa-owns-api-replicas
+    match: {group: apps, kind: Deployment, name: api}
+    managers: [kube-controller-manager]
+  # A deploy bot stamps the last sync time on every object.
+  - name: sync-timestamp
+    paths: ['.metadata.annotations["example.com/synced-at"]']
