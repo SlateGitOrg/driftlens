@@ -1,0 +1,32 @@
+{
+  "csa": {
+    "categoryAccuracy": "100.0%",
+    "documentedLimitationMisses": 21,
+    "expectedChanges": 317,
+    "manualAccuracy": "93.4%",
+    "matched": 317,
+    "opAccuracy": "100.0%",
+    "originAccuracy": "100.0%",
+    "precision": "100.0%",
+    "recall": "100.0%",
+    "reportedChanges": 317,
+    "statusAccuracy": "100.0%",
+    "trials": 60
+  },
+  "seed": 2026,
+  "ssa": {
+    "categoryAccuracy": "100.0%",
+    "documentedLimitationMisses": 108,
+    "expectedChanges": 312,
+    "manualAccuracy": "93.3%",
+    "matched": 312,
+    "opAccuracy": "100.0%",
+    "originAccuracy": "76.0%",
+    "precision": "100.0%",
+    "recall": "100.0%",
+    "reportedChanges": 312,
+    "statusAccuracy": "90.0%",
+    "trials": 60
+  },
+  "trials": 120
+}

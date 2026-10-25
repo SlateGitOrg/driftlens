@@ -8,7 +8,7 @@ SETUP_ENVTEST := $(GO) run sigs.k8s.io/controller-runtime/tools/setup-envtest@v0
 COVERAGE_MIN := 80
 BIN := bin/driftlens
 
-.PHONY: all check fmt-check lint vet test cover build demo envtest fixtures golden bench fuzz clean
+.PHONY: all check fmt-check lint vet test cover build demo envtest fixtures golden eval bench fuzz clean
 
 all: check
 
@@ -51,6 +51,14 @@ fixtures: envtest ## re-capture live.yaml snapshots of every scenario from envte
 
 golden: ## rewrite expected.txt/expected.json from the offline replay
 	$(GO) test ./test/scenarios/ -run TestGoldenOffline -count=1 -update
+
+EVAL_SEED ?= 2026
+eval: envtest ## randomized ground-truth mutation evaluation on envtest; writes eval/results-seed-$(EVAL_SEED).json
+	@mkdir -p eval
+	@KUBEBUILDER_ASSETS="$$($(SETUP_ENVTEST) use $(ENVTEST_K8S) -p path)" DRIFTLENS_REQUIRE_ENVTEST=1 \
+	  DRIFTLENS_EVAL_SEED=$(EVAL_SEED) DRIFTLENS_EVAL_OUT=$(CURDIR)/eval/results-seed-$(EVAL_SEED).json \
+	  $(GO) test ./test/scenarios/ -run TestMutationEval -count=1 -v | grep -E 'eval_test.go|^(ok|FAIL|---)'
+	@cat eval/results-seed-$(EVAL_SEED).json
 
 bench: ## engine throughput benchmarks
 	$(GO) test ./pkg/drift/ -run '^$$' -bench . -benchmem -count=1

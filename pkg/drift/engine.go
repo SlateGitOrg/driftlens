@@ -299,20 +299,43 @@ func attribute(p fieldpath.Path, op objpath.Path, full [3]*unstructured.Unstruct
 
 func matchGlobs(globs []string, s string) bool { return rules.MatchGlobs(globs, s) }
 
-// orderedPaths lists set members in structural order. With topmost, members
-// whose ancestor is also a member are dropped (an added subtree is reported
-// once, at its root).
-func orderedPaths(set *fieldpath.Set, topmost bool) []fieldpath.Path {
+// orderedPaths lists set members in structural order. With collapse, an
+// added or removed subtree is reported at the granularity people think in:
+// a whole list element (a container, an env var, a port) is one change, and
+// map members (labels, annotations, data keys, struct fields) are reported
+// individually down to their leaves.
+func orderedPaths(set *fieldpath.Set, collapse bool) []fieldpath.Path {
 	var out []fieldpath.Path
 	set.Iterate(func(p fieldpath.Path) {
-		if topmost {
+		if collapse {
 			for i := 1; i < len(p); i++ {
-				if set.Has(p[:i]) {
-					return
+				if isListElement(p[:i]) && set.Has(p[:i]) {
+					return // reported as part of its list element
 				}
+			}
+			if !isListElement(p) && hasMembersBelow(set, p) {
+				return // a map: its members are reported instead
 			}
 		}
 		out = append(out, p.Copy())
 	})
 	return out
+}
+
+func isListElement(p fieldpath.Path) bool {
+	last := p[len(p)-1]
+	return last.Key != nil || last.Value != nil || last.Index != nil
+}
+
+// hasMembersBelow reports whether set contains a strict descendant of p.
+func hasMembersBelow(set *fieldpath.Set, p fieldpath.Path) bool {
+	cur := set
+	for _, pe := range p {
+		child, ok := cur.Children.Get(pe)
+		if !ok {
+			return false
+		}
+		cur = child
+	}
+	return !cur.Empty()
 }
