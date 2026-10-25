@@ -88,7 +88,9 @@ func evalOps() []evalOp {
 			},
 			want: one(truth{"Deployment", imagePath, drift.OpModify, drift.OriginGit, drift.CategoryImage, false, false})},
 		{name: "git-replicas", modes: "both", excludes: []string{"live-scale", "hpa-scale"},
-			git:  func(dep, _ *unstructured.Unstructured) { _ = unstructured.SetNestedField(dep.Object, int64(4), "spec", "replicas") },
+			git: func(dep, _ *unstructured.Unstructured) {
+				_ = unstructured.SetNestedField(dep.Object, int64(4), "spec", "replicas")
+			},
 			want: one(truth{"Deployment", ".spec.replicas", drift.OpModify, drift.OriginGit, drift.CategoryScale, false, false})},
 		{name: "git-config", modes: "both", excludes: []string{"conflict-config"},
 			git:  setData("K1", "git-value"),
@@ -97,7 +99,7 @@ func evalOps() []evalOp {
 			live: &liveEdit{"kubectl-edit", "", "ConfigMap", types.MergePatchType, `{"data":{"K2":"live-value"}}`},
 			want: one(truth{"ConfigMap", ".data.K2", drift.OpModify, drift.OriginLive, drift.CategorySpec, true, false})},
 		{name: "git-remove-key", modes: "both",
-			git: func(_, cm *unstructured.Unstructured) { unstructured.RemoveNestedField(cm.Object, "data", "K3") },
+			git:  func(_, cm *unstructured.Unstructured) { unstructured.RemoveNestedField(cm.Object, "data", "K3") },
 			want: one(truth{"ConfigMap", ".data.K3", drift.OpRemove, drift.OriginGit, drift.CategorySpec, false, false})},
 		{name: "git-add-key", modes: "both", limits: "ssa",
 			git:  setData("K4", "new"),
@@ -140,11 +142,11 @@ func evalObjects(ns string) (dep, cm *unstructured.Unstructured) {
 }
 
 type score struct {
-	limits                                        []string
-	trials, expected, reported, matched           int
+	limits                                         []string
+	trials, expected, reported, matched            int
 	originOK, categoryOK, manualOK, opOK, statusOK int
-	statusTotal                                   int
-	misses                                        []string
+	statusTotal                                    int
+	misses                                         []string
 }
 
 func pct(a, b int) string {
