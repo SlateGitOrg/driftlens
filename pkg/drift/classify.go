@@ -83,11 +83,12 @@ func (c *classifier) add(res *ObjectResult, op Op, p fieldpath.Path) {
 	// only (an annotations map whose only key was ignored). Empty
 	// containers carry no state, so they are not drift.
 	if (op == OpRemove && emptyContainer(lv)) || (op == OpAdd && emptyContainer(dv)) {
-		ig := attribute(p, objp, c.full, c.ruleset, c.ix)
-		if ig.Rule == "-" {
+		// When an ignore rule emptied it, the hidden members are listed
+		// individually by explainIgnored; otherwise note the empty container.
+		if ig := attribute(p, objp, c.full, c.ruleset, c.ix); ig.Rule == "-" {
 			ig.Reason = "only an empty map or list differs"
+			res.Ignored = append(res.Ignored, ig)
 		}
-		res.Ignored = append(res.Ignored, ig)
 		return
 	}
 	switch op {
