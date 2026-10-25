@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -364,4 +365,66 @@ func toFloat(v any) (float64, bool) {
 		return f, err == nil
 	}
 	return 0, false
+}
+
+// Delete removes the value at p from obj. Keyed and set elements are found
+// by their key or value, indexed elements by position; a removed list
+// element is cut out of its list. It reports whether a value was removed.
+func Delete(obj any, p Path) bool {
+	if len(p) == 0 {
+		return false
+	}
+	_, ok := del(obj, p)
+	return ok
+}
+
+// del removes p below node and returns the value that must replace node
+// (lists shrink, so their parent has to store the new slice header).
+func del(node any, p Path) (any, bool) {
+	s := p[0]
+	if s.Kind == SegField {
+		m, ok := node.(map[string]any)
+		if !ok {
+			return node, false
+		}
+		v, ok := m[s.Field]
+		if !ok {
+			return node, false
+		}
+		if len(p) == 1 {
+			delete(m, s.Field)
+			return m, true
+		}
+		nv, ok := del(v, p[1:])
+		if ok {
+			m[s.Field] = nv
+		}
+		return m, ok
+	}
+	l, ok := node.([]any)
+	if !ok {
+		return node, false
+	}
+	i := -1
+	switch s.Kind {
+	case SegIndex:
+		if s.Index >= 0 && s.Index < len(l) {
+			i = s.Index
+		}
+	case SegKey:
+		i, _ = findKeyed(l, s.Key)
+	case SegValue:
+		i, _ = findValue(l, s.Value)
+	}
+	if i < 0 {
+		return node, false
+	}
+	if len(p) == 1 {
+		return slices.Delete(l, i, i+1), true
+	}
+	nv, ok := del(l[i], p[1:])
+	if ok {
+		l[i] = nv
+	}
+	return l, ok
 }

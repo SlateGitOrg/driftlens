@@ -591,3 +591,29 @@ func find(node any, steps []step, prefix Path, out *[]Path) {
 		}
 	}
 }
+
+// Positional reports whether the pattern has a list-index step ([N] or a
+// numeric JSON pointer token). Such a step means a position in one object,
+// so it can name different elements on two sides whose lists are ordered
+// differently.
+func (p *Pattern) Positional() bool {
+	for _, st := range p.steps {
+		if st.kind == stepIndex || st.kind == stepFieldOrIndex {
+			return true
+		}
+	}
+	return false
+}
+
+// PositionalSegments tells, for each segment of a path returned by Find,
+// whether the pattern step that produced it is a list-index step.
+func (p *Pattern) PositionalSegments() []bool {
+	var out []bool
+	for _, st := range p.steps {
+		if st.kind == stepSelect {
+			continue // select() filters the current node and adds no segment
+		}
+		out = append(out, st.kind == stepIndex || st.kind == stepFieldOrIndex)
+	}
+	return out
+}

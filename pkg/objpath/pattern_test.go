@@ -190,3 +190,29 @@ func FuzzCompile(f *testing.F) {
 		}
 	})
 }
+
+func TestPositional(t *testing.T) {
+	cases := []struct {
+		src  string
+		pos  bool
+		segs []bool
+	}{
+		{"/spec/replicas", false, []bool{false, false}},
+		{"/spec/containers/1/image", true, []bool{false, false, true, false}},
+		{"/spec/containers/*/image", false, []bool{false, false, false, false}},
+		{".spec.containers[0].image", true, []bool{false, false, true, false}},
+		{`.spec.containers[] | select(.name == "app") | .env[2]`, true, []bool{false, false, false, false, true}},
+		{".spec.containers[name=app].image", false, []bool{false, false, false, false}},
+	}
+	for _, c := range cases {
+		p := MustCompile(c.src)
+		if p.Positional() != c.pos || !reflect.DeepEqual(p.PositionalSegments(), c.segs) {
+			t.Errorf("%s: positional %v segments %v", c.src, p.Positional(), p.PositionalSegments())
+		}
+		for _, f := range p.Find(sample()) {
+			if len(f) != len(c.segs) {
+				t.Errorf("%s: match %s has %d segments, want %d", c.src, f, len(f), len(c.segs))
+			}
+		}
+	}
+}

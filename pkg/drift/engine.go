@@ -178,16 +178,7 @@ func (e *Engine) diff(ctx context.Context, desired, live *unstructured.Unstructu
 	full := [3]*unstructured.Unstructured{d, lp.Object, a}
 	eff := full
 	if len(ruleset) > 0 {
-		for i, o := range full {
-			if o != nil {
-				eff[i] = o.DeepCopy()
-				for _, r := range ruleset {
-					for _, p := range r.Patterns() {
-						p.Prune(eff[i].Object)
-					}
-				}
-			}
-		}
+		eff = e.pruneIgnored(full, ruleset)
 	}
 
 	tvs, schemaName, warn, err := e.typer.convert(eff[0], eff[1], eff[2])

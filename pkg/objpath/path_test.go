@@ -1,6 +1,9 @@
 package objpath
 
 import (
+	"encoding/json"
+	"reflect"
+	"strings"
 	"testing"
 
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
@@ -147,5 +150,55 @@ func TestScalarEqual(t *testing.T) {
 		if got := ScalarEqual(c.a, c.b); got != c.eq {
 			t.Errorf("ScalarEqual(%v,%v)=%v", c.a, c.b, got)
 		}
+	}
+}
+
+func TestDelete(t *testing.T) {
+	obj := func() map[string]any {
+		return map[string]any{"spec": map[string]any{
+			"replicas":   int64(1),
+			"finalizers": []any{"a", "b"},
+			"containers": []any{
+				map[string]any{"name": "web", "image": "w", "args": []any{"x", "y", "z"}},
+				map[string]any{"name": "side", "image": "s"},
+			},
+		}}
+	}
+	web := Key(KeyField{Name: "name", Value: "web"})
+	cases := []struct {
+		path Path
+		ok   bool
+		want string
+	}{
+		{Fields("spec", "replicas"), true, `"replicas":`},
+		{append(Fields("spec", "containers"), web, Field("image")), true, `"image":"w"`},
+		{append(Fields("spec", "containers"), Key(KeyField{Name: "name", Value: "side"})), true, `"side"`},
+		{append(Fields("spec", "containers"), Index(0), Field("args"), Index(1)), true, `"y"`},
+		{append(Fields("spec", "finalizers"), Segment{Kind: SegValue, Value: "a"}), true, `"a"`},
+		{append(Fields("spec", "containers"), Key(KeyField{Name: "name", Value: "nope"})), false, ""},
+		{append(Fields("spec", "containers"), Index(5)), false, ""},
+		{append(Fields("spec", "replicas"), Field("x")), false, ""},
+		{append(Fields("spec", "replicas"), Index(0)), false, ""},
+		{Fields("spec", "missing", "x"), false, ""},
+		{nil, false, ""},
+	}
+	for _, c := range cases {
+		o := obj()
+		if got := Delete(o, c.path); got != c.ok {
+			t.Errorf("Delete(%s) = %v", c.path, got)
+			continue
+		}
+		b, _ := json.Marshal(o)
+		if c.ok && strings.Contains(string(b), c.want) {
+			t.Errorf("Delete(%s) left %s in %s", c.path, c.want, b)
+		}
+		if !c.ok && !reflect.DeepEqual(o, obj()) {
+			t.Errorf("Delete(%s) changed the object: %s", c.path, b)
+		}
+	}
+	o := obj()
+	Delete(o, append(Fields("spec", "containers"), web))
+	if cs := o["spec"].(map[string]any)["containers"].([]any); len(cs) != 1 || cs[0].(map[string]any)["name"] != "side" {
+		t.Fatalf("list not compacted: %v", cs)
 	}
 }
