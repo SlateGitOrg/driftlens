@@ -186,9 +186,6 @@ func (e *Engine) diff(ctx context.Context, desired, live *unstructured.Unstructu
 						p.Prune(eff[i].Object)
 					}
 				}
-				// Pruning can leave empty maps behind (an annotations map
-				// whose only key was ignored); drop them like the server does.
-				normalize.Canonicalize(eff[i].Object)
 			}
 		}
 	}
@@ -219,7 +216,7 @@ func (e *Engine) diff(ctx context.Context, desired, live *unstructured.Unstructu
 	if err != nil {
 		return fmt.Errorf("compare: %w", err)
 	}
-	c := classifier{cfg: e.cfg, ix: ix, basis: res.Basis, d: D, l: L, a: A, gvk: gvk}
+	c := classifier{cfg: e.cfg, ix: ix, basis: res.Basis, d: D, l: L, a: A, gvk: gvk, full: full, ruleset: ruleset}
 	for _, p := range orderedPaths(cmp.Modified, false) {
 		c.add(res, OpModify, p)
 	}

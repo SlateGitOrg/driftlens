@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"sort"
 
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 
@@ -19,6 +20,10 @@ type classifier struct {
 	basis   Basis
 	d, l, a side
 	gvk     schema.GroupVersionKind
+	// full holds desired/live/last-applied before ignore rules, for
+	// attributing hidden differences to the rule that hid them.
+	full    [3]*unstructured.Unstructured
+	ruleset []*rules.IgnoreRule
 }
 
 // owners splits the live owners of p into GitOps and other managers.
@@ -74,6 +79,17 @@ func (c *classifier) add(res *ObjectResult, op Op, p fieldpath.Path) {
 		ch.LastApplied = c.redact(objp, av)
 	}
 
+	// Pruning by ignore rules can leave an empty map or list on one side
+	// only (an annotations map whose only key was ignored). Empty
+	// containers carry no state, so they are not drift.
+	if (op == OpRemove && emptyContainer(lv)) || (op == OpAdd && emptyContainer(dv)) {
+		ig := attribute(p, objp, c.full, c.ruleset, c.ix)
+		if ig.Rule == "-" {
+			ig.Reason = "only an empty map or list differs"
+		}
+		res.Ignored = append(res.Ignored, ig)
+		return
+	}
 	switch op {
 	case OpModify:
 		ch.Origin, ch.Note = c.originModify(dv, lv, av, aok, own)
@@ -193,6 +209,16 @@ func category(gvk schema.GroupVersionKind, p objpath.Path, own owners) Category 
 		return CategoryImage
 	}
 	return CategorySpec
+}
+
+func emptyContainer(v any) bool {
+	switch t := v.(type) {
+	case map[string]any:
+		return len(t) == 0
+	case []any:
+		return len(t) == 0
+	}
+	return false
 }
 
 // finish sets the status and classes of a compared object.

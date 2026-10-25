@@ -277,3 +277,26 @@ func TestSnapshotSourceScope(t *testing.T) {
 		t.Fatal("get missing")
 	}
 }
+
+func TestIgnoredKeyLeavesNoEmptyMapDrift(t *testing.T) {
+	cfg, err := rules.Parse([]byte("apiVersion: driftlens/v1\nkind: DriftConfig\nignore: [{name: stamp, paths: ['.metadata.annotations[\"x/synced\"]']}, {name: empty-list, paths: [/data/drop]}]\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	live := u(t, cm)
+	live.SetAnnotations(map[string]string{"x/synced": "now"})
+	live.Object["metadata"].(map[string]any)["managedFields"] = []any{map[string]any{
+		"manager": "sync-bot", "operation": "Update",
+		"fieldsV1": map[string]any{"f:metadata": map[string]any{"f:annotations": map[string]any{".": map[string]any{}, "f:x/synced": map[string]any{}}}},
+	}}
+	res := New(Options{Config: cfg}).Diff(context.Background(), u(t, cm), live)
+	if res.Status != StatusInSync || len(res.Ignored) != 1 || res.Ignored[0].Rule != "stamp" {
+		t.Fatalf("%+v", res)
+	}
+	// An empty container on the desired side alone is not drift either.
+	d := u(t, "apiVersion: v1\nkind: ConfigMap\nmetadata: {name: c, namespace: ns, annotations: {x/synced: t}}\ndata: {a: \"1\", b: \"2\"}\n")
+	res = New(Options{Config: cfg}).Diff(context.Background(), d, u(t, cm))
+	if res.Status != StatusInSync || len(res.Ignored) != 1 {
+		t.Fatalf("%+v", res)
+	}
+}

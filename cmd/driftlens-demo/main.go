@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -92,8 +93,8 @@ func run(ctx context.Context, bin, example string) error {
 	section("4. Out-of-band changes during an incident")
 	type change struct {
 		say, manager, sub, name string
-		patchType          types.PatchType
-		patch              string
+		patchType               types.PatchType
+		patch                   string
 	}
 	for _, ch := range []change{
 		{"kubectl scale deployment/web --replicas=6", "kubectl-scale", "scale", "web", types.MergePatchType, `{"spec":{"replicas":6}}`},
@@ -182,7 +183,7 @@ func (d *driver) run(args ...string) error {
 	cmd := d.cmd(args...)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	err := cmd.Run()
-	if ee, ok := err.(*exec.ExitError); ok && ee.ExitCode() == 1 {
+	if ee := (*exec.ExitError)(nil); errors.As(err, &ee) && ee.ExitCode() == 1 {
 		fmt.Println("(exit 1: drift found)")
 		return nil
 	}
@@ -192,7 +193,7 @@ func (d *driver) run(args ...string) error {
 func (d *driver) capture(args ...string) ([]byte, error) {
 	fmt.Printf("$ driftlens %s\n", d.shown(args))
 	out, err := d.cmd(args...).Output()
-	if ee, ok := err.(*exec.ExitError); ok && ee.ExitCode() == 1 {
+	if ee := (*exec.ExitError)(nil); errors.As(err, &ee) && ee.ExitCode() == 1 {
 		return out, nil
 	}
 	return out, err
@@ -204,7 +205,7 @@ func (d *driver) captureOffline(args ...string) ([]byte, error) {
 	cmd := exec.Command(d.bin, args...) // #nosec G204 -- the demo runs the binary it just built
 	cmd.Env = append(os.Environ(), "KUBECONFIG=/dev/null", "NO_COLOR=1")
 	out, err := cmd.Output()
-	if ee, ok := err.(*exec.ExitError); ok && ee.ExitCode() == 1 {
+	if ee := (*exec.ExitError)(nil); errors.As(err, &ee) && ee.ExitCode() == 1 {
 		return out, nil
 	}
 	return out, err
@@ -213,7 +214,7 @@ func (d *driver) captureOffline(args ...string) ([]byte, error) {
 func (d *driver) exitCode(args ...string) int {
 	cmd := d.cmd(args...)
 	if err := cmd.Run(); err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
+		if ee := (*exec.ExitError)(nil); errors.As(err, &ee) {
 			return ee.ExitCode()
 		}
 		return -1
