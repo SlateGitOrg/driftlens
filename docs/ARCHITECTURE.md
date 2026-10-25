@@ -177,20 +177,25 @@ field and inventing an "added" or "default" difference on the other. So `pruneIg
 (`pkg/drift/prune.go`) handles a pattern with an index step (`[N]`, numeric pointer
 token) differently:
 
-1. The pattern is found in the desired object. Each match is rewritten with the desired
+1. The pattern is split after its last index step into a head (up to and including that
+   step) and a tail (the steps after it, such as `/args/*` or `.env[]`).
+2. The head is found in the desired object. Each match is rewritten with the desired
    object's typed field set: an element of an associative or set list becomes its merge
    key (`containers[name="side"]`) or value; elements of atomic lists keep their position.
-2. A match whose index step landed on an associative-list element is deleted from every
-   side by that key (`objpath.Delete`).
-3. On live and last-applied, matches whose index steps only hit atomic lists (`args`,
-   `command`, and every list under the deduced schema) are still deleted by position on
-   that side, because atomic lists are compared by position. Matches found by counting
-   positions in an associative list on those sides are dropped.
+3. A head match whose index step landed on an associative-list element names that element
+   on every side by key. Head matches whose index steps only hit atomic lists (`args`,
+   `command`, and every list under the deduced schema) are found on each side by position,
+   because atomic lists are compared by position. Head matches found by counting
+   positions in an associative list on live or last-applied are dropped.
+4. With no tail, each element is deleted (`objpath.Delete`). Otherwise the tail is pruned
+   below each element on each side on its own (`Pattern.PruneAt`), so
+   `containers[0].args[]` also hides an arg that exists only live under that container.
 
 Consequences: an index counts in Git's order, and an index past the end of desired's list
 selects nothing, so a live-only element cannot be ignored by position (use `[name=x]` or
-`[]`). Under the deduced schema (CRDs) all indices stay positional. Patterns without index
-steps keep the plain per-side `Prune`.
+`[]`). Values below an element the index selects are matched on each side, live-only ones
+included. Under the deduced schema (CRDs) all indices stay positional. Patterns without
+index steps keep the plain per-side `Prune`.
 
 ## 7. Complexity
 

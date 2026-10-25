@@ -147,8 +147,10 @@ ignore:
 Prefer `[name=app]` or `select()` over list indices. An index (`/containers/1/image`,
 `.env[0]`) counts positions in the **desired** object; for keyed lists (containers, env,
 ports, volumes, ...) driftlens then hides that element by its merge key on the live side,
-so a reordered or inserted live element does not move the rule onto a different one. An
-index past the end of the Git list selects nothing. Indices into atomic lists (`args`,
+so a reordered or inserted live element does not move the rule onto a different one. The
+rest of the pattern after the index is matched on each side, so
+`.containers[0].env[]` also hides an env var added live to that container. An index past
+the end of the Git list selects nothing. Indices into atomic lists (`args`,
 `command`, all CRD lists) are positional on each side. See
 [ARCHITECTURE §6](docs/ARCHITECTURE.md#6-path-patterns).
 
@@ -322,7 +324,8 @@ All rulings with their costs: [DECISIONS.md](DECISIONS.md).
   not `conflict`; (3) deletions are never attributed to an actor. Client-side apply's
   last-applied annotation does not have problems (1) and (2).
 - **List indices in ignore rules count in Git's order.** An index into a keyed list
-  cannot name an element that exists only live, and a rule written against an old Git
+  cannot name an element that exists only live (values below an element it does name,
+  such as a live-added arg under `containers[0].args[]`, are hidden), and a rule written against an old Git
   order follows the element now at that position in Git. Use `[name=x]` selectors for
   rules that must survive reordering.
 - **Static defaults cover core kinds only** (Pod templates, Deployment, StatefulSet,
