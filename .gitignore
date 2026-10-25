@@ -2,7 +2,7 @@
 /dist/
 *.out
 *.test
-coverage.*
+/coverage.html
 /.envtest/
 .DS_Store
 test-results.json
