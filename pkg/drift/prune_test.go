@@ -226,3 +226,79 @@ func TestPositionalIgnoreDeducedSchema(t *testing.T) {
 		t.Fatalf("schema %s changes %q", res.Schema, changeLines(res))
 	}
 }
+
+// An index step that lands on a keyed element only names that element; the
+// steps after it are evaluated on each side. So a wildcard below a
+// positionally selected container also hides children that exist only live.
+func TestPositionalIgnoreWildcardBelowKeyedIndex(t *testing.T) {
+	setWeb := func(o map[string]any, field string, v any) {
+		for _, c := range containers(o) {
+			if c.(map[string]any)["name"] == "web" {
+				c.(map[string]any)[field] = v
+			}
+		}
+	}
+	env := func(names ...string) []any {
+		var out []any
+		for _, n := range names {
+			out = append(out, map[string]any{"name": n, "value": "v" + n})
+		}
+		return out
+	}
+	cases := []struct {
+		pat, field  string
+		desired     any
+		live        any
+		reorderLive bool
+	}{
+		{"/spec/template/spec/containers/0/args/*", "args", []any{"a", "b"}, []any{"a", "b", "c"}, false},
+		{".spec.template.spec.containers[0].args[]", "args", []any{"a", "b"}, []any{"a", "b", "c"}, true},
+		{".spec.template.spec.containers[0].env[]", "env", env("A"), env("A", "B"), false},
+		{"/spec/template/spec/containers/0/env/*/value", "env", env("A"), []any{map[string]any{"name": "A", "value": "changed"}}, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.pat, func(t *testing.T) {
+			cfg := ignoreCfg(t, tc.pat)
+			cfg.ReportUnattributed = true // no history: report live-only values
+			e := New(Options{Config: cfg})
+			d := u(t, twoContainers)
+			setWeb(d.Object, tc.field, tc.desired)
+			var l map[string]any
+			if tc.reorderLive {
+				l = reorder(t, "web", "nginx:1")
+			} else {
+				l = u(t, twoContainers).Object
+			}
+			setWeb(l, tc.field, tc.live)
+			res := e.Diff(context.Background(), d, defaulted(t, l))
+			if res.Status != StatusInSync {
+				t.Fatalf("changes %q", changeLines(res))
+			}
+			for _, ig := range res.Ignored {
+				if ig.Rule != "r0" || !strings.Contains(ig.Path, `[name="web"]`) {
+					t.Fatalf("ignored %+v", res.Ignored)
+				}
+			}
+			if len(res.Ignored) == 0 {
+				t.Fatal("nothing attributed to the rule")
+			}
+
+			// The other container is not touched by the rule.
+			for _, c := range containers(l) {
+				if c.(map[string]any)["name"] == "side" {
+					c.(map[string]any)[tc.field] = tc.live
+				}
+			}
+			res = e.Diff(context.Background(), d, defaulted(t, l))
+			got := changeLines(res)
+			if len(got) == 0 {
+				t.Fatal("drift on the other container is hidden")
+			}
+			for _, c := range got {
+				if !strings.Contains(c, `[name="side"].`+tc.field) {
+					t.Fatalf("changes %q", got)
+				}
+			}
+		})
+	}
+}

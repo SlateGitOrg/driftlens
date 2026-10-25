@@ -17,10 +17,11 @@ import (
 // matches associative lists (containers, env, ports, ...) by merge key, not
 // by position, so pruning "containers/1" on each side would remove two
 // different containers when the live order differs from Git. Such indices
-// are counted in the desired object and the selected elements are pruned
-// from every side by merge key. Indices into atomic lists (args, command,
-// and every list under the deduced schema) are compared by position, so
-// they keep selecting by position on each side.
+// are counted in the desired object and the selected elements are found on
+// every side by merge key; the rest of the pattern below them is evaluated
+// on each side. Indices into atomic lists (args, command, and every list
+// under the deduced schema) are compared by position, so they keep
+// selecting by position on each side.
 func (e *Engine) pruneIgnored(full [3]*unstructured.Unstructured, ruleset []*rules.IgnoreRule) [3]*unstructured.Unstructured {
 	var eff [3]*unstructured.Unstructured
 	for i, o := range full {
@@ -55,22 +56,31 @@ func (e *Engine) pruneIgnored(full [3]*unstructured.Unstructured, ruleset []*rul
 
 // prunePositional prunes a pattern with index steps from all sides, reading
 // indices into associative lists against the desired side (eff[0]).
+//
+// The pattern is split after its last index step. The head (up to that step)
+// is resolved to concrete elements: those it reaches through a keyed index
+// step are found in desired and named by merge key on every side; the others
+// (indices into atomic lists only) are found on each side by position. The
+// tail (the steps after it, such as "/args/*" or ".env[]") is then evaluated
+// below each element on each side on its own, so values that exist only live
+// or only in last-applied under a selected element are pruned as well.
 func (e *Engine) prunePositional(p *objpath.Pattern, eff [3]*unstructured.Unstructured) {
-	var del [3][]objpath.Path
+	head, tail, _ := p.SplitAtLastIndex()
+	var at [3][]objpath.Path
 	for i, o := range eff {
 		if o == nil {
 			continue
 		}
-		for _, m := range e.resolvePositional(p, o) {
+		for _, m := range e.resolvePositional(head, o) {
 			switch {
 			case !m.keyed:
-				del[i] = append(del[i], m.path) // atomic lists: by position, per side
+				at[i] = append(at[i], m.path) // atomic lists: by position, per side
 			case i == 0:
 				for j := range eff {
-					del[j] = append(del[j], m.path) // by merge key on every side
+					at[j] = append(at[j], m.path) // by merge key on every side
 				}
 			}
-			// A keyed match found only by counting positions on live or
+			// A keyed element found only by counting positions on live or
 			// last-applied is dropped: positions count in the desired object.
 		}
 	}
@@ -78,10 +88,14 @@ func (e *Engine) prunePositional(p *objpath.Pattern, eff [3]*unstructured.Unstru
 		if o == nil {
 			continue
 		}
-		// Find returns matches in list order; deleting from the end keeps
-		// earlier positions valid.
-		for k := len(del[i]) - 1; k >= 0; k-- {
-			objpath.Delete(o.Object, del[i][k])
+		// Find returns matches in list order; working from the end keeps
+		// earlier positions valid when elements are removed.
+		for k := len(at[i]) - 1; k >= 0; k-- {
+			if tail == nil {
+				objpath.Delete(o.Object, at[i][k])
+			} else {
+				tail.PruneAt(o.Object, at[i][k])
+			}
 		}
 	}
 }
