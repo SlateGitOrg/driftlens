@@ -129,10 +129,10 @@ func TestRelates(t *testing.T) {
 		want bool
 	}{
 		{sel, append(append(Path{}, app...), Field("resources"), Field("requests"), Field("cpu")), true}, // below a match
-		{sel, append(append(Path{}, app...), Field("resources")), true},                                   // exact
-		{sel, Path{Field("spec"), Field("containers")}, true},                                               // ancestor (atomic list)
-		{sel, append(append(Path{}, side...), Field("resources")), false},                                  // select fails
-		{sel, append(append(Path{}, app...), Field("image")), false},                                       // other field
+		{sel, append(append(Path{}, app...), Field("resources")), true},                                  // exact
+		{sel, Path{Field("spec"), Field("containers")}, true},                                            // ancestor (atomic list)
+		{sel, append(append(Path{}, side...), Field("resources")), false},                                // select fails
+		{sel, append(append(Path{}, app...), Field("image")), false},                                     // other field
 		{MustCompile("/spec/containers/1"), side, true},
 		{MustCompile("/spec/containers/0"), side, false},
 		{MustCompile("/spec/replicas"), Fields("spec", "replicas"), true},
