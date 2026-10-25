@@ -157,7 +157,7 @@ ReplicaSet or RC, or any field owned through the `scale` subresource → scale;
 `pkg/objpath` compiles two syntaxes into one step list:
 
 - **JSON pointer** (RFC 6901, `~0`/`~1` escapes). `*` matches any member or element; a
-  numeric token matches a map key of that name or a list index.
+  numeric token matches a map key of that name or a list index (see "List indices" below).
 - **jq-like**: `.field`, `."quoted"`, `["quoted"]`, `[]` (every element or value), `[N]`,
   `[k=v,k2=v2]` (shorthand for select on list elements), and pipes to
   `select(.a.b == literal and ...)` with JSON scalar literals.
@@ -168,6 +168,30 @@ path is matched by, lies below, or lies above a pattern match. `explainIgnored` 
 `Relates` to say which rule hid a difference. A fuzz test (`FuzzCompile`) checks that
 compilation never panics and that `Find` returns nothing after `Prune`.
 
+**List indices in ignore rules.** Patterns are applied to desired, live and last-applied,
+but the comparison matches associative lists (containers, env, ports, volumes, ...) by
+merge key, not position. Pruning `containers/1` on each side separately would therefore
+remove two different containers whenever the live order differs from Git (a `kubectl
+edit` or JSON patch that inserts at index 0 shifts every live position), hiding the wrong
+field and inventing an "added" or "default" difference on the other. So `pruneIgnored`
+(`pkg/drift/prune.go`) handles a pattern with an index step (`[N]`, numeric pointer
+token) differently:
+
+1. The pattern is found in the desired object. Each match is rewritten with the desired
+   object's typed field set: an element of an associative or set list becomes its merge
+   key (`containers[name="side"]`) or value; elements of atomic lists keep their position.
+2. A match whose index step landed on an associative-list element is deleted from every
+   side by that key (`objpath.Delete`).
+3. On live and last-applied, matches whose index steps only hit atomic lists (`args`,
+   `command`, and every list under the deduced schema) are still deleted by position on
+   that side, because atomic lists are compared by position. Matches found by counting
+   positions in an associative list on those sides are dropped.
+
+Consequences: an index counts in Git's order, and an index past the end of desired's list
+selects nothing, so a live-only element cannot be ignored by position (use `[name=x]` or
+`[]`). Under the deduced schema (CRDs) all indices stay positional. Patterns without index
+steps keep the plain per-side `Prune`.
+
 ## 7. Complexity
 
 For one object with `n` fields (all three sides together):
@@ -175,7 +199,7 @@ For one object with `n` fields (all three sides together):
 | Step | Time | Space |
 |---|---|---|
 | Normalize + static default | O(n) | O(n) copy |
-| Prune `r` patterns | O(r·n) worst case (`[]` wildcards), typically O(r·depth) | O(1) extra |
+| Prune `r` patterns | O(r·n) worst case (`[]` wildcards), typically O(r·depth); plus one typed conversion per side, O(n log n), for each pattern with a list index | O(1) extra; O(n) per indexed pattern (key table) |
 | Typed conversion + Compare | O(n log n) (sorted path-element sets) | O(n) |
 | Ownership lookup per changed path | O(m·d), with `m` managedFields entries and `d` path depth | O(f) decoded field sets |
 | Classification | O(c·(m·d + depth)) for `c` changes | O(c) |
