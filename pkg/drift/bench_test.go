@@ -7,7 +7,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 // loadPair returns the manual-edits scenario: a Deployment with four kinds

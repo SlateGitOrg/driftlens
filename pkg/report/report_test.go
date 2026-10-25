@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 func sampleReport() *drift.Report {

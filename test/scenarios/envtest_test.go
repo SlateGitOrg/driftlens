@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/archit2501/driftlens/internal/cluster"
-	"github.com/archit2501/driftlens/internal/kubeenv"
-	"github.com/archit2501/driftlens/internal/scenario"
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/internal/cluster"
+	"github.com/SlateGitOrg/driftlens/internal/kubeenv"
+	"github.com/SlateGitOrg/driftlens/internal/scenario"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 var updateLive = flag.Bool("update-live", false, "rewrite live.yaml snapshots captured from envtest")

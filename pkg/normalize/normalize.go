@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utiljson "k8s.io/apimachinery/pkg/util/json"
 
-	"github.com/archit2501/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
 )
 
 // LastAppliedAnnotation is written by `kubectl apply` (client-side apply).

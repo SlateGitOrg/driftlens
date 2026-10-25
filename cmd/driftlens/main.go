@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/archit2501/driftlens/internal/cli"
+	"github.com/SlateGitOrg/driftlens/internal/cli"
 )
 
 func main() {

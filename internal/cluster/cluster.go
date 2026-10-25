@@ -20,7 +20,7 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 // Client reads live objects. It implements drift.LiveSource.

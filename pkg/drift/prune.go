@@ -4,8 +4,8 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 
-	"github.com/archit2501/driftlens/pkg/objpath"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 // pruneIgnored returns copies of the three sides (desired, live,

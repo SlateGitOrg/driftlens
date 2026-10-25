@@ -10,7 +10,7 @@ import (
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/archit2501/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
 )
 
 // TextOptions tune the text renderer.

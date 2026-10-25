@@ -17,9 +17,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/yaml"
 
-	"github.com/archit2501/driftlens/internal/cluster"
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/internal/cluster"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 // Target names the object a mutation acts on.

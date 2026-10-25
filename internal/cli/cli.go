@@ -15,12 +15,12 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/yaml"
 
-	"github.com/archit2501/driftlens/internal/cluster"
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/report"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/internal/cluster"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/report"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 // Version is set at build time with -ldflags "-X .../internal/cli.Version=...".

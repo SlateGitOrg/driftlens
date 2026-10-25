@@ -1,5 +1,7 @@
 # driftlens
 
+[![CI](https://github.com/SlateGitOrg/driftlens/actions/workflows/ci.yml/badge.svg)](https://github.com/SlateGitOrg/driftlens/actions/workflows/ci.yml)
+
 **Semantic drift detection between Git desired state and live Kubernetes objects.**
 
 `kubectl diff` tells you *that* the cluster differs from your manifests. driftlens
@@ -18,6 +20,10 @@ apps/v1 Deployment shop/worker  DRIFTED  image, manual-edit, spec  (basis: manag
 It is a Go library and CLI. It reads desired state from plain YAML/JSON, directories,
 stdin (for example `kustomize build` output) or Kustomize directories built in-process,
 and live state from a cluster (kubeconfig) or from an offline snapshot file.
+
+## Why
+
+GitOps pipelines make the cluster *eventually* match Git, but when it does not, a plain diff mixes four different situations. driftlens separates them so reports are actionable.
 
 ## Who it is for
 
@@ -85,7 +91,7 @@ Package map (non-test Go; `git ls-files 'pkg/*.go' 'internal/*.go' | grep -v _te
 Deeper design, algorithms and complexity: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 Rulings and trade-offs: [DECISIONS.md](DECISIONS.md).
 
-## Quickstart
+## Quick start
 
 Requirements: Go 1.27, and for the tests/demo the envtest binaries (kube-apiserver and
 etcd, about 100 MB, downloaded once by `make envtest`).
@@ -346,9 +352,8 @@ All rulings with their costs: [DECISIONS.md](DECISIONS.md).
   controllers with patch requests under their field-manager names. The manager names
   (`kubectl-scale`, `kubectl-set`, ...) follow kubectl's defaults. They were not captured
   from a real kubectl binary in the tests.
-- **CI has never run.** `.github/workflows/ci.yml` mirrors `make check` and `make demo`
-  but has not run on GitHub yet, because the repository has not been pushed.
-- No users or production deployments. This is a portfolio project.
+- No production deployments yet; treat the classification as a tool for reviewing drift,
+  not as an enforcement mechanism.
 
 ## Roadmap
 
@@ -368,4 +373,6 @@ make golden         # rewrite expected.{txt,json} from the offline replay
 make eval bench fuzz
 ```
 
-License: [MIT](LICENSE).
+## License
+
+MIT — see [LICENSE](LICENSE).

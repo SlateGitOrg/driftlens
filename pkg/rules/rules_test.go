@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 func TestDefaultConfig(t *testing.T) {

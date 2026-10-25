@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/archit2501/driftlens/internal/cli"
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/internal/cli"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 const cliManifests = `

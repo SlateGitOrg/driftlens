@@ -43,4 +43,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/archit2501/driftlens
+        - github.com/SlateGitOrg/driftlens

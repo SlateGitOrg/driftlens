@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/archit2501/driftlens/internal/cluster"
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/report"
+	"github.com/SlateGitOrg/driftlens/internal/cluster"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/report"
 )
 
 // defaultsCorpus covers every branch of the static defaulter.

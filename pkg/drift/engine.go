@@ -11,11 +11,11 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 	"sigs.k8s.io/structured-merge-diff/v6/typed"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/objpath"
-	"github.com/archit2501/driftlens/pkg/ownership"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/ownership"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 // LiveSource provides live objects.

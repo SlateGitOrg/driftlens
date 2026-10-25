@@ -11,10 +11,10 @@ import (
 	utiljson "k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/yaml"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/objpath"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 func u(t *testing.T, y string) *unstructured.Unstructured {

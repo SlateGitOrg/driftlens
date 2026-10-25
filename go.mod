@@ -1,4 +1,4 @@
-module github.com/archit2501/driftlens
+module github.com/SlateGitOrg/driftlens
 
 go 1.27.1
 

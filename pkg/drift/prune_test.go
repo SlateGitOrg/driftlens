@@ -8,8 +8,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 const twoContainers = `

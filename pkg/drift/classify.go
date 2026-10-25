@@ -8,9 +8,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 
-	"github.com/archit2501/driftlens/pkg/objpath"
-	"github.com/archit2501/driftlens/pkg/ownership"
-	"github.com/archit2501/driftlens/pkg/rules"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/ownership"
+	"github.com/SlateGitOrg/driftlens/pkg/rules"
 )
 
 // classifier turns raw structural differences into explained Changes.

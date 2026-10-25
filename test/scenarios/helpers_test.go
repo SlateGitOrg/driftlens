@@ -9,10 +9,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/archit2501/driftlens/internal/scenario"
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/normalize"
-	"github.com/archit2501/driftlens/pkg/report"
+	"github.com/SlateGitOrg/driftlens/internal/scenario"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/normalize"
+	"github.com/SlateGitOrg/driftlens/pkg/report"
 )
 
 var update = flag.Bool("update", false, "rewrite expected.txt / expected.json from the offline (snapshot) run")

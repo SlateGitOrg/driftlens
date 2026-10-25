@@ -6,7 +6,7 @@ package drift
 import (
 	"sort"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 // ReportAPIVersion versions the JSON report schema.

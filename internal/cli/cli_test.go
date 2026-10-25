@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/archit2501/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
 )
 
 const scen = "../../testdata/scenarios/"

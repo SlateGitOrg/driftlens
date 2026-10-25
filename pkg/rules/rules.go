@@ -12,8 +12,8 @@ import (
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/archit2501/driftlens/pkg/manifest"
-	"github.com/archit2501/driftlens/pkg/objpath"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/pkg/objpath"
 )
 
 // ConfigKind is the kind written at the top of a configuration file.

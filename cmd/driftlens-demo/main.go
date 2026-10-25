@@ -17,10 +17,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/archit2501/driftlens/internal/cluster"
-	"github.com/archit2501/driftlens/internal/kubeenv"
-	"github.com/archit2501/driftlens/pkg/drift"
-	"github.com/archit2501/driftlens/pkg/manifest"
+	"github.com/SlateGitOrg/driftlens/internal/cluster"
+	"github.com/SlateGitOrg/driftlens/internal/kubeenv"
+	"github.com/SlateGitOrg/driftlens/pkg/drift"
+	"github.com/SlateGitOrg/driftlens/pkg/manifest"
 )
 
 func main() {

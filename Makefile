@@ -40,7 +40,7 @@ cover:
 	@hack/coverage.sh cover.out $(COVERAGE_MIN)
 
 build:
-	$(GO) build -trimpath -ldflags "-X github.com/archit2501/driftlens/internal/cli.Version=$$(git describe --tags --always --dirty 2>/dev/null || echo dev)" -o $(BIN) ./cmd/driftlens
+	$(GO) build -trimpath -ldflags "-X github.com/SlateGitOrg/driftlens/internal/cli.Version=$$(git describe --tags --always --dirty 2>/dev/null || echo dev)" -o $(BIN) ./cmd/driftlens
 
 demo: build envtest ## offline end-to-end demo on a throwaway API server
 	@KUBEBUILDER_ASSETS="$$($(SETUP_ENVTEST) use $(ENVTEST_K8S) -p path)" $(GO) run ./cmd/driftlens-demo --driftlens $(BIN)
