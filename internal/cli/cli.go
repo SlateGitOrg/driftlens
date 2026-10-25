@@ -105,10 +105,10 @@ func (m *multi) Set(v string) error { *m = append(*m, v); return nil }
 
 // sourceFlags are shared by diff and snapshot.
 type sourceFlags struct {
-	files, kustomize   multi
+	files, kustomize    multi
 	kubeconfig, kubeCtx string
-	namespace          string
-	verbose            bool
+	namespace           string
+	verbose             bool
 }
 
 func (s *sourceFlags) register(fs *flag.FlagSet) {

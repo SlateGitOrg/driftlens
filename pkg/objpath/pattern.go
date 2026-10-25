@@ -92,10 +92,10 @@ func parsePointer(s string) ([]step, error) {
 			return nil, fmt.Errorf("invalid escape in token %q", tok)
 		}
 		tok = strings.ReplaceAll(strings.ReplaceAll(tok, "~1", "/"), "~0", "~")
-		switch {
-		case tok == "*":
+		switch tok {
+		case "*":
 			steps = append(steps, step{kind: stepEach})
-		case tok == "":
+		case "":
 			return nil, errors.New("empty reference token")
 		default:
 			if n, err := strconv.Atoi(tok); err == nil && n >= 0 && strconv.Itoa(n) == tok {
@@ -123,8 +123,8 @@ func parseJQ(s string) ([]step, error) {
 		if p.eof() {
 			return steps, nil
 		}
-		switch c := p.s[p.pos]; {
-		case c == '.':
+		switch c := p.s[p.pos]; c {
+		case '.':
 			p.pos++
 			if p.eof() || p.peekIs(' ') || p.peekIs('|') {
 				continue // bare "." is the identity
@@ -149,13 +149,13 @@ func parseJQ(s string) ([]step, error) {
 				}
 				steps = append(steps, step{kind: stepField, name: name})
 			}
-		case c == '[':
+		case '[':
 			st, err := p.bracket()
 			if err != nil {
 				return nil, err
 			}
 			steps = append(steps, st)
-		case c == '|':
+		case '|':
 			p.pos++
 			p.skipSpace()
 			if strings.HasPrefix(p.s[p.pos:], "select") {

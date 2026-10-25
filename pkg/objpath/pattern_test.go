@@ -90,7 +90,7 @@ func TestFindAndPrune(t *testing.T) {
 				t.Fatal(err)
 			}
 			obj := sample()
-			if got := paths(p.Find(obj)); !reflect.DeepEqual(got, c.find) && !(len(got) == 0 && len(c.find) == 0) {
+			if got := paths(p.Find(obj)); !reflect.DeepEqual(got, c.find) && (len(got) != 0 || len(c.find) != 0) {
 				t.Fatalf("Find = %v, want %v", got, c.find)
 			}
 			if n := p.Prune(obj); n != c.removed {

@@ -33,11 +33,11 @@ const (
 type Op string
 
 const (
-	// OpModify: both sides have the field with different values.
+	// OpModify means both sides have the field with different values.
 	OpModify Op = "modify"
-	// OpAdd: desired has the field, live does not.
+	// OpAdd means desired has the field, live does not.
 	OpAdd Op = "add"
-	// OpRemove: live has the field, desired does not.
+	// OpRemove means live has the field, desired does not.
 	OpRemove Op = "remove"
 )
 
@@ -63,14 +63,14 @@ const ClassManualEdit = "manual-edit"
 type Origin string
 
 const (
-	// OriginGit: desired changed since the last apply; live still holds the
+	// OriginGit means desired changed since the last apply; live still holds the
 	// applied value. Applying desired resolves it.
 	OriginGit Origin = "git"
-	// OriginLive: live changed since the last apply (out-of-band edit).
+	// OriginLive means live changed since the last apply (out-of-band edit).
 	OriginLive Origin = "live"
-	// OriginConflict: both desired and live changed since the last apply.
+	// OriginConflict means both desired and live changed since the last apply.
 	OriginConflict Origin = "conflict"
-	// OriginUnknown: there is not enough history to tell.
+	// OriginUnknown means there is not enough history to tell.
 	OriginUnknown Origin = "unknown"
 )
 

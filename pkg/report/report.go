@@ -52,7 +52,7 @@ func Text(w io.Writer, r *drift.Report, o TextOptions) error {
 	tw := &errWriter{w: w}
 	p := painter{on: o.Color}
 	for _, obj := range r.Objects {
-		if obj.Status == drift.StatusInSync && !o.ShowInSync && !(o.ShowIgnored && len(obj.Ignored) > 0) {
+		if obj.Status == drift.StatusInSync && !o.ShowInSync && (!o.ShowIgnored || len(obj.Ignored) == 0) {
 			continue
 		}
 		writeObject(tw, p, obj, o)

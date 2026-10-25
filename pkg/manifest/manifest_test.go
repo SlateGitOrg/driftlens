@@ -2,11 +2,12 @@ package manifest
 
 import (
 	"bytes"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func names(t *testing.T, objs []*unstructured.Unstructured) []string {

@@ -74,15 +74,15 @@ func (c *Client) mapping(gvk schema.GroupVersionKind) (*meta.RESTMapping, error)
 	return m, nil
 }
 
-func (c *Client) resource(gvk schema.GroupVersionKind, namespace string) (dynamic.ResourceInterface, *meta.RESTMapping, error) {
+func (c *Client) resource(gvk schema.GroupVersionKind, namespace string) (dynamic.ResourceInterface, error) {
 	m, err := c.mapping(gvk)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if m.Scope.Name() == meta.RESTScopeNameNamespace {
-		return c.dyn.Resource(m.Resource).Namespace(namespace), m, nil
+		return c.dyn.Resource(m.Resource).Namespace(namespace), nil
 	}
-	return c.dyn.Resource(m.Resource), m, nil
+	return c.dyn.Resource(m.Resource), nil
 }
 
 // Namespaced reports whether gvk is a namespaced kind.
@@ -97,7 +97,7 @@ func (c *Client) Namespaced(_ context.Context, gvk schema.GroupVersionKind) (boo
 // Get fetches the live object named by ref in ref's API version. A missing
 // object yields (nil, nil).
 func (c *Client) Get(ctx context.Context, ref manifest.Ref) (*unstructured.Unstructured, error) {
-	ri, _, err := c.resource(ref.GVK(), ref.Namespace)
+	ri, err := c.resource(ref.GVK(), ref.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (ServerDefaulter) Name() string { return "server" }
 
 // Default implements normalize.Defaulter.
 func (s ServerDefaulter) Default(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	ri, _, err := s.Client.resource(obj.GroupVersionKind(), obj.GetNamespace())
+	ri, err := s.Client.resource(obj.GroupVersionKind(), obj.GetNamespace())
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func generatePrefix(name string) string {
 // Apply server-side-applies obj as fieldManager (with force, like a GitOps
 // controller would).
 func (c *Client) Apply(ctx context.Context, obj *unstructured.Unstructured, fieldManager string) (*unstructured.Unstructured, error) {
-	ri, _, err := c.resource(obj.GroupVersionKind(), obj.GetNamespace())
+	ri, err := c.resource(obj.GroupVersionKind(), obj.GetNamespace())
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (c *Client) Apply(ctx context.Context, obj *unstructured.Unstructured, fiel
 // does on first apply: the object carries the last-applied-configuration
 // annotation and the request is an Update-operation create.
 func (c *Client) CreateWithLastApplied(ctx context.Context, obj *unstructured.Unstructured, fieldManager string) (*unstructured.Unstructured, error) {
-	ri, _, err := c.resource(obj.GroupVersionKind(), obj.GetNamespace())
+	ri, err := c.resource(obj.GroupVersionKind(), obj.GetNamespace())
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (c *Client) CreateWithLastApplied(ctx context.Context, obj *unstructured.Un
 // Patch patches the object named by ref as fieldManager. subresource may be
 // empty or e.g. "scale".
 func (c *Client) Patch(ctx context.Context, ref manifest.Ref, pt types.PatchType, data []byte, fieldManager, subresource string) error {
-	ri, _, err := c.resource(ref.GVK(), ref.Namespace)
+	ri, err := c.resource(ref.GVK(), ref.Namespace)
 	if err != nil {
 		return err
 	}

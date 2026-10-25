@@ -28,7 +28,7 @@ func Assets() (string, error) {
 	}
 	base, err := envtest.SetupEnvtestDefaultBinaryAssetsDirectory()
 	if err != nil {
-		return "", fmt.Errorf("%w: %v", ErrNoAssets, err)
+		return "", fmt.Errorf("%w: %w", ErrNoAssets, err)
 	}
 	dir := filepath.Join(base, fmt.Sprintf("%s-%s-%s", K8sVersion, runtime.GOOS, runtime.GOARCH))
 	return dir, check(dir)
@@ -36,7 +36,7 @@ func Assets() (string, error) {
 
 func check(dir string) error {
 	for _, bin := range []string{"kube-apiserver", "etcd"} {
-		if _, err := os.Stat(filepath.Join(dir, bin)); err != nil {
+		if _, err := os.Stat(filepath.Join(dir, bin)); err != nil { // #nosec G703 -- operator-chosen asset directory
 			return fmt.Errorf("%w (looked in %s)", ErrNoAssets, dir)
 		}
 	}
