@@ -191,6 +191,9 @@ func runDiff(ctx context.Context, args []string, sio IO) (int, error) {
 	if output != "text" && output != "json" {
 		return ExitError, usageError("-o must be text or json")
 	}
+	if color != "auto" && color != "always" && color != "never" {
+		return ExitError, usageError("--color must be auto, always or never")
+	}
 	if exitCode != "any" && exitCode != "drift" && exitCode != "never" {
 		return ExitError, usageError("--exit-code must be any, drift or never")
 	}

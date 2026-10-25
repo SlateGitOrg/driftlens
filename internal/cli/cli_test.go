@@ -84,6 +84,7 @@ func TestDiffUsageErrors(t *testing.T) {
 		"no desired":      {"diff", "--live", d + "live.yaml"},
 		"bad output":      {"diff", "-f", d + "applied.yaml", "--live", d + "live.yaml", "-o", "yaml"},
 		"bad exit code":   {"diff", "-f", d + "applied.yaml", "--live", d + "live.yaml", "--exit-code", "sometimes"},
+		"bad color":       {"diff", "-f", d + "applied.yaml", "--live", d + "live.yaml", "--color", "rainbow"},
 		"bad defaults":    {"diff", "-f", d + "applied.yaml", "--live", d + "live.yaml", "--defaults", "magic"},
 		"server offline":  {"diff", "-f", d + "applied.yaml", "--live", d + "live.yaml", "--defaults", "server"},
 		"extra args":      {"diff", "-f", d + "applied.yaml", "stray"},

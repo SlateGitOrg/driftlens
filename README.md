@@ -165,8 +165,8 @@ through the `scale` subresource), `metadata`, and `spec` for everything else.
 `make demo` starts envtest, applies `examples/shop/overlays/prod` with server-side
 apply as `argocd-controller`, simulates an incident (kubectl scale / set image / edit /
 label, an HPA scaling through the scale subresource, a bot stamping an annotation),
-then diffs against the *next* Git revision. Output of a real run (sections 1–4 and 6
-trimmed; the full run is in the build report):
+then diffs against the *next* Git revision. Output of a real run (sections 1, 2, 4 and 6
+omitted here):
 
 ```
 == 3. Right after the sync: everything is in sync ==========================
@@ -232,7 +232,7 @@ tests cannot silently skip, then the coverage gate):
 
 ```
 66 tests + 81 subtests passed, 0 failed, 1 skipped
-core coverage: 96.1% (1737/1808 statements), threshold 80%
+core coverage: 96.1% (1739/1810 statements), threshold 80%
 ```
 
 The skip is the server-defaults replay of the one client-side-apply scenario, which
