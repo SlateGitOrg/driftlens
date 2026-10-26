@@ -23,7 +23,11 @@ and live state from a cluster (kubeconfig) or from an offline snapshot file.
 
 ## Why
 
-GitOps pipelines make the cluster *eventually* match Git, but when it does not, a plain diff mixes four different situations. driftlens separates them so reports are actionable.
+GitOps pipelines make the cluster *eventually* match Git, but when it does not,
+a plain diff lumps together five different situations: a pending Git change, a
+manual `kubectl scale`, a hot-patched image, a conflict where Git and a human both
+changed the same field, and a server default that is not a difference at all.
+driftlens classifies each one so the report tells you what to do next.
 
 ## Who it is for
 
@@ -73,7 +77,7 @@ flowchart LR
   CL --> REP[report: text / JSON / exit code]
 ```
 
-Package map (non-test Go; `git ls-files 'pkg/*.go' 'internal/*.go' | grep -v _test.go | xargs wc -l` = 4,349 lines, 4,594 including `cmd/`):
+Package map (non-test Go; `git ls-files 'pkg/*.go' 'internal/*.go' | grep -v _test.go | xargs wc -l` = 4,683 lines, 4,928 including `cmd/`):
 
 | Package | Role |
 |---|---|
