@@ -93,7 +93,7 @@ Package map (non-test Go; `git ls-files 'pkg/*.go' 'internal/*.go' | grep -v _te
 | `internal/scenario`, `internal/kubeenv` | Scenario runner and envtest wrapper shared by tests and the demo |
 
 Deeper design, algorithms and complexity: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-Rulings and trade-offs: [DECISIONS.md](DECISIONS.md).
+Design decisions and trade-offs: [DECISIONS.md](DECISIONS.md).
 
 ## Quick start
 
@@ -323,7 +323,7 @@ per object with `--defaults=server`).
   `--show-ignored`.
 - **Secrets are redacted** in every output, including values that only differ.
 
-All rulings with their costs: [DECISIONS.md](DECISIONS.md).
+All design decisions with their costs: [DECISIONS.md](DECISIONS.md).
 
 ## Limitations
 
